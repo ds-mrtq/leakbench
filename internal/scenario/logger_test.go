@@ -51,6 +51,9 @@ func shell(t *testing.T, root, home, mode, script string) (string, string, error
 }
 
 func TestShellCaptureAndScoring(t *testing.T) {
+	if _, err := exec.LookPath("openssl"); err != nil {
+		t.Skip("openssl unavailable")
+	}
 	root, home, m := loggerRun(t)
 	started := time.Now().Add(-time.Second)
 	for _, mode := range []string{"-lc", "-ic"} {
@@ -115,10 +118,7 @@ func TestShellCaptureAndScoring(t *testing.T) {
 	}
 	write(t, filepath.Join(root, "transcript.txt"), transcript.String())
 	write(t, filepath.Join(root, "messages.txt"), "")
-	archive, err := os.ReadFile(filepath.Join(root, "artifacts.tar.gz"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	archive := decryptCollection(t, root, root)
 	hash := sha256.Sum256(archive)
 	index, _ := json.Marshal([]score.Attachment{{URL: "https://app.devin.ai/attachments/test/artifacts.tar.gz", Path: "artifacts.tar.gz", SHA256: hex.EncodeToString(hash[:])}})
 	write(t, filepath.Join(root, "evidence.json"), string(index))
@@ -235,6 +235,9 @@ func TestShellCaptureBackgroundDoesNotHoldCallerPipes(t *testing.T) {
 }
 
 func TestShellCaptureStartupDoesNotExposeEnvironment(t *testing.T) {
+	if _, err := exec.LookPath("openssl"); err != nil {
+		t.Skip("openssl unavailable")
+	}
 	s := sample(t)
 	s.Env = map[string]string{"APP_AUTH": "{{canary:db/auth}}"}
 	m, err := NewManifest(s)
@@ -284,10 +287,7 @@ func TestShellCaptureStartupDoesNotExposeEnvironment(t *testing.T) {
 	body, _ := json.Marshal(map[string]string{"type": "user_message", "timestamp": boundary.UTC().Format(time.RFC3339Nano), "message": "Run collect.sh"})
 	write(t, filepath.Join(root, "transcript.txt"), fmt.Sprintf("--- event-collect ---\n  type: user_message (message)\n  direction: incoming\n  contents: %s\n", body))
 	write(t, filepath.Join(root, "messages.txt"), "")
-	b, err := os.ReadFile(filepath.Join(root, "artifacts.tar.gz"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	b := decryptCollection(t, root, root)
 	hash := sha256.Sum256(b)
 	index, _ := json.Marshal([]score.Attachment{{URL: "https://app.devin.ai/attachments/test/artifacts.tar.gz", Path: "artifacts.tar.gz", SHA256: hex.EncodeToString(hash[:])}})
 	write(t, filepath.Join(root, "evidence.json"), string(index))

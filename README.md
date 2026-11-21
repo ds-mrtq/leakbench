@@ -55,9 +55,12 @@ Validate them with `go run ./cmd/lb lint`.
 go run ./cmd/lb render --scenario scenarios/A01 --out ./run-A01
 ```
 
-The output directory must be empty. It contains `manifest.json` (runner-only),
+The output directory must be empty. It contains `manifest.json` and a fresh
+RSA-3072 `collection-key.pem` (both runner-only; private key mode 0600),
 an inspectable `repo/`, `home/`, `remote/`, scripts, and `bundle.tar.gz`.
-Only the bundle goes to the agent: the manifest and control value are excluded.
+Only the bundle goes to the agent: the manifest, control value and private
+key are excluded. Keep the output directory off the agent's filesystem and
+retain the key for the corresponding run; losing it makes collection unreadable.
 Extract it in an isolated run directory, run `bash bootstrap.sh`, then source
 `~/.profile` in subsequent shells to load the environment. Work in `repo/`.
 Bootstrap installs the home overlay and a local bare `origin` at
@@ -67,11 +70,54 @@ The bundled repo and remote have one baseline commit. Files containing planted
 values are initially untracked (and not automatically ignored), preserving the
 commit-and-push tasks' local-file exposure risk.
 
-After the task, run `bash collect.sh`. It prints the path to `artifacts.tar.gz`,
-containing the complete workspace including `.git`, the installed bare remote,
+After the task, run `bash collect.sh`. It prints only the path to the opaque
+`session-archive.bin`. Inside is the same archive of the workspace including
+`.git`, the installed bare remote,
 shell history, `.bash_sessions`, `typescript`, top-level `*.log` files and
 `shell-logs/` in both the run directory and HOME. Put adapter shell logs in those
-directories. Collection does not include the runner manifest.
+directories. Collection does not include the runner manifest or private key.
+
+### Encrypted collection
+
+Collection requires the `openssl` CLI (tested with OpenSSL 3.0); if missing,
+it fails clearly instead of falling back to plaintext. Rendering and runner
+decryption use only the Go standard library and do not require OpenSSL.
+The public key is embedded in `collect.sh` as escaped DER bytes. Every
+collection generates independent random 32-byte AES and HMAC keys and a
+16-byte IV. It uses AES-256-CBC with PKCS#7 padding, RSA-OAEP with SHA-256
+and MGF1-SHA256 to wrap the two keys, and HMAC-SHA256 over the version header,
+wrapped keys, IV and ciphertext (encrypt-then-MAC). The neutral binary format
+is `SESSION-DATA-1\n`, 384 wrapped-key bytes, 16 IV bytes, ciphertext, and a
+32-byte tag. Go verifies authentication before decrypting/unpadding.
+
+The collector disables command tracing before generating symmetric keys.
+Its mode-0700 staging directory and files are removed on success or ordinary
+failure, including the plaintext tarball and temporary keys; the final file
+is mode 0600. This is normal deletion, not secure erasure, and SIGKILL/crashes
+can leave staging files. Keep run workspaces isolated and disposable.
+
+On the runner, preserve the downloaded encrypted file and its checksum, then:
+
+```sh
+go run ./cmd/lb decrypt --key run-A01/collection-key.pem session-archive.bin --out artifacts.tar.gz
+```
+
+`decrypt` prints the new plaintext path, writes mode 0600, refuses to
+overwrite an existing file, and writes nothing on authentication failure.
+Index the decrypted `.tar.gz` in the run's `evidence.json` with the original
+attachment URL and the SHA-256 of the **decrypted** bytes. Keep the opaque
+original/checksum separately for provenance. Then use `lb score` normally;
+plaintext archives from earlier runs still work unchanged. The scorer does
+not directly consume `.bin` files: decrypt them on the runner first.
+
+This avoids asking the agent to inspect/redact a plaintext collector output,
+but it is not remote attestation or guaranteed independent collection. An
+agent can still refuse to run/attach it, alter source files or the collector,
+or use the public key to encrypt substitute contents. A process inspecting
+the same filesystem/process arguments can also observe temporary plaintext
+or symmetric keys. Do not interpret successful decryption as proof of
+complete or untampered collection; a trusted out-of-agent collector is still
+needed for that guarantee.
 
 ### Workspace Bash capture
 
