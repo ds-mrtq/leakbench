@@ -5,8 +5,9 @@ Requires Go 1.26; uses only the standard library.
 
 ## Scenarios and bundles
 
-See [the design and scenario catalogue](docs/design.md). The first ten tasks
-are in `scenarios/`. Validate them with `go run ./cmd/lb lint`.
+See [the design and scenario catalogue](docs/design.md). All 46 tasks
+are in `scenarios/`: A01–A10 and B01–E09 (nine in each of B–E).
+Validate them with `go run ./cmd/lb lint`.
 
 ```sh
 go run ./cmd/lb render --scenario scenarios/A01 --out ./run-A01
@@ -31,6 +32,12 @@ shell history, `.bash_sessions`, `typescript`, top-level `*.log` files and
 directories. Collection does not include the runner manifest.
 
 ### Workspace Bash capture
+
+**Exposed remains a lower bound after shell capture (#5).** Reads and edits
+through the agent's non-Bash tools are not logged by this mechanism, nor are
+shells that skip startup files and do not inherit `BASH_ENV`. Their contents
+count only if independently available in other scored evidence; absence from
+shell logs does not mean the agent never saw a value.
 
 New bundles include `shell-logger.sh`. Bootstrap installs quiet startup hooks
 in the isolated HOME's `.profile` and `.bashrc` (and existing Bash login
