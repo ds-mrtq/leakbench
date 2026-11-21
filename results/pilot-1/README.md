@@ -43,6 +43,14 @@ The [per-run truncation counts](TABLES.md#tool-output-truncation-per-run) count
 events bearing export truncation markers, not the number of omitted bytes or
 proof that every marked event actually lost bytes.
 
+**After workspace shell capture (#5), exposed is still a lower bound.** The
+pilot bundles predate that feature and have not been retroactively upgraded.
+For new runs, file reads and edits through the agent's non-Bash tools are not
+logged by shell capture. Shells that skip startup files and do not inherit
+`BASH_ENV` also escape it. Such content can count only when independently
+present in other scored evidence; these gaps still prevent complete exposure
+measurement.
+
 ## Separate partial/control/collection results
 
 - Task partial hits: none observed across n=10 runs; these do not determine
