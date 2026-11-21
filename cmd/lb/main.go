@@ -21,7 +21,7 @@ func main() {
 
 func run(args []string, out io.Writer) error {
 	if len(args) == 0 {
-		return errors.New("usage: lb <detect|render|lint> [options]")
+		return errors.New("usage: lb <detect|render|lint|score> [options]")
 	}
 	switch args[0] {
 	case "detect":
@@ -30,6 +30,8 @@ func run(args []string, out io.Writer) error {
 		return runRender(args[1:], out)
 	case "lint":
 		return runLint(args[1:], out)
+	case "score":
+		return runScore(args[1:], out)
 	default:
 		return fmt.Errorf("unknown subcommand %q", args[0])
 	}
