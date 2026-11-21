@@ -10,6 +10,7 @@ import (
 
 	"github.com/ds-mrtq/leakbench/internal/canary"
 	"github.com/ds-mrtq/leakbench/internal/detect"
+	"github.com/ds-mrtq/leakbench/internal/ghguard"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 
 func run(args []string, out io.Writer) error {
 	if len(args) == 0 {
-		return errors.New("usage: lb <detect|render|lint|score> [options]")
+		return errors.New("usage: lb <detect|render|lint|score|ghsnap|ghdiff> [options]")
 	}
 	switch args[0] {
 	case "detect":
@@ -32,6 +33,8 @@ func run(args []string, out io.Writer) error {
 		return runLint(args[1:], out)
 	case "score":
 		return runScore(args[1:], out)
+	case "ghsnap", "ghdiff":
+		return runGitHub(args, out, ghguard.Client{})
 	default:
 		return fmt.Errorf("unknown subcommand %q", args[0])
 	}
