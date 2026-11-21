@@ -1,0 +1,805 @@
+Event details (50 events):
+Showing 50 (offset=150)
+More events may exist. Use offset=200 to fetch the next batch (an empty result means you have reached the end).
+
+--- event-01a1fdddf6d47ab0a108f19f783e9251 ---
+  type: devin_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:04 UTC
+  contents: {
+  "type": "devin_thoughts",
+  "timestamp": "2026-11-21T11:29:04.724000Z",
+  "message": "**Determining ticket status**\n\nI'm trying to set the ticket status as \"Up next.\" I'm currently waiting for input from the dispatcher, and I\u2019m considering how to handle the situation if the stop isn't finished. I need to ensure that I'm still using the block while I'm waiting for that input. I should leave a note stating that the status is \"Working\" since dispatch is on hold, and it might help to send the main details first.",
+  "seen_event_id": "event-01a1fdddefb870129d41b53e63c3dd46",
+  "thinking_duration_ms": 2929,
+  "has_content": true
+}
+
+--- event-01a1fdddfb2a73c0811c25a44516c3fb ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:05 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:29:05.834000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fdddfb2a73c0811c25bbf5d84190 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:05 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:29:05.834000Z",
+  "tool_name": "scripted_tools",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fdddfb2a73c0811c25c82fc728ff ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:05 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:29:05.834000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-c2cb50255a644c05bc606382fb753786"
+}
+
+--- event-01a1fdddfb6c7b13a9f0f26e1f3d81ff ---
+  type: scripted_tools_started (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:05 UTC
+  contents: {
+  "type": "scripted_tools_started",
+  "timestamp": "2026-11-21T11:29:05.900000Z",
+  "shell_id": "script_run-555dfe28-b6ed-4b5c-be2f-11c320123d5c",
+  "script": "text((await tools.devin_ticket_manage({action:\"update\",board_id:\"board-8e8f8cd4bd4e4cea851e85028302ef0d\",ticket_id:\"ticket-ced28f2cb2b143aa921c1cd3bad3fb86\",status_update:\"Waiting for the requester\u2019s message; the ticket has no request yet.\"})).structuredContent);\n",
+  "variant": "codex"
+}
+
+--- event-01a1fdddfb9877e38fa1372dfa23123f ---
+  type: mcp_tool_call_started (mcp)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:05 UTC
+  contents: {
+  "type": "mcp_tool_call_started",
+  "timestamp": "2026-11-21T11:29:05.944000Z",
+  "shell_id": "mcp-http-call-devin-mcp-18a2ddb0",
+  "server": "devin_mcp",
+  "tool_name": "devin_ticket_manage",
+  "tool_input": "{\"action\":\"update\",\"board_id\":\"board-8e8f8cd4bd4e4cea851e85028302ef0d\",\"ticket_id\":\"ticket-ced28f2cb2b143aa921c1cd3bad3fb86\",\"status_update\":\"Waiting for the requester\u2019s message; the ticket has no request yet.\"}",
+  "display_name": "Devin MCP",
+  "scripted_run_id": "script_run-555dfe28-b6ed-4b5c-be2f-11c320123d5c",
+  "card": false
+}
+
+--- event-01a1fdddfc9676e1b0b66c72bb7c85e9 ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:06 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:29:06.198000Z",
+  "short": "Updating ticket status",
+  "summary": "Updating ticket status while awaiting requester input"
+}
+
+--- event-01a1fdddff7c7150b1abef5039408144 ---
+  type: mcp_tool_call (mcp)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:06 UTC
+  contents: {
+  "type": "mcp_tool_call",
+  "timestamp": "2026-11-21T11:29:06.940000Z",
+  "result_meta": {
+    "fastmcp": {
+      "wrap_result": true
+    }
+  },
+  "server": "devin_mcp",
+  "tool_name": "devin_ticket_manage",
+  "tool_input": "{\"action\":\"update\",\"board_id\":\"board-8e8f8cd4bd4e4cea851e85028302ef0d\",\"ticket_id\":\"ticket-ced28f2cb2b143aa921c1cd3bad3fb86\",\"status_update\":\"Waiting for the requester\u2019s message; the ticket has no request yet.\"}",
+  "exit_code": 0,
+  "shell_id": "mcp-http-call-devin-mcp-18a2ddb0",
+  "output_trunc": "Ticket updated: ticket-ced28f2cb2b143aa921c1cd3bad3fb86\n\nTicket ID: ticket-ced28f2cb2b143aa921c1cd3bad3fb86\nKey: TASK-64\nBoard ID: board-8e8f8cd4bd4e4cea851e85028302ef0d\nTitle: Workspace task\nStatus: status-43fd79f1acd9438d9f9da0c5f8615088 (category: started, color: #f2c94c)\nPriority: none (0)\nAssignee: (unassigned)\nClaimed by: devin-77269590701c45bb99e829357edc251a\nSort order: 1795248825907.466\nEstimate: (none)\nBlocked by: (none)\nBlocks: (none)\nCustom fields: (none)\nTags:\n  - folder: Batch 2 runs (tag-7eb96bd90ff14ac2bcba2b31c93b097b)\nResources: (none)\nCreated by: user:service-user-0e4823e66bb645e4a1c728ceb66d8004\nCreated: 2026-11-21T11:26:31.479809Z\nUpdated: 2026-11-21T11:29:06.494930Z\nVersion: 3\n\nDescription:\n<!-- devin-status -->\nWaiting for the requester\u2019s message; the ticket has no request yet.\n\n---\n\nA message with the task follows.",
+  "scripted_run_id": "script_run-555dfe28-b6ed-4b5c-be2f-11c320123d5c",
+  "card": false
+}
+
+--- event-01a1fdddff887010ace97b1dd837edaa ---
+  type: scripted_tools (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:06 UTC
+  contents: {
+  "type": "scripted_tools",
+  "timestamp": "2026-11-21T11:29:06.952000Z",
+  "output_trunc": "{\"result\":\"Ticket updated: ticket-ced28f2cb2b143aa921c1cd3bad3fb86\\n\\nTicket ID: ticket-ced28f2cb2b143aa921c1cd3bad3fb86\\nKey: TASK-64\\nBoard ID: board-8e8f8cd4bd4e4cea851e85028302ef0d\\nTitle: Workspace task\\nStatus: status-43fd79f1acd9438d9f9da0c5f8615088 (category: started, color: #f2c94c)\\nPriority: none (0)\\nAssignee: (unassigned)\\nClaimed by: devin-77269590701c45bb99e829357edc251a\\nSort order: 1795248825907.466\\nEstimate: (none)\\nBlocked by: (none)\\nBlocks: (none)\\nCustom fields: (none)\\nTags:\\n  - folder: Batch 2 runs (tag-7eb96bd90ff14ac2bcba2b31c93b097b)\\nResources: (none)\\nCreated by: user:service-user-0e4823e66bb645e4a1c728ceb66d8004\\nCreated: 2026-11-21T11:26:31.479809Z\\nUpdated: 2026-11-21T11:29:06.494930Z\\nVersion: 3\\n\\nDescription:\\n<!-- devin-status -->\\nWaiting for the requester\u2019s message; the ticket has no request yet.\\n\\n---\\n\\nA message with the task follows.\"}\n",
+  "script": "text((await tools.devin_ticket_manage({action:\"update\",board_id:\"board-8e8f8cd4bd4e4cea851e85028302ef0d\",ticket_id:\"ticket-ced28f2cb2b143aa921c1cd3bad3fb86\",status_update:\"Waiting for the requester\u2019s message; the ticket has no request yet.\"})).structuredContent);\n",
+  "variant": "codex",
+  "exit_code": 0,
+  "shell_id": "script_run-555dfe28-b6ed-4b5c-be2f-11c320123d5c"
+}
+
+--- event-01a1fdddff887010ace97b2c4ebd9225 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:06 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:29:06.952000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fdddff8979b0b4546c36388c2d49 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:06 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:29:06.953000Z",
+  "main_chain_growth_message_count": 46,
+  "iteration_count": 14,
+  "current_context_tokens": 34494,
+  "current_context_bytes": 117609,
+  "total_tool_output_bytes": 50051,
+  "total_tool_invocation_bytes": 2177,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "scripted_tools",
+      "call_count": 10,
+      "total_invocation_bytes": 1212,
+      "total_output_bytes": 42725,
+      "total_output_images": 0,
+      "approx_ant_tokens": 10678
+    },
+    {
+      "tool_name": "skill_invoke",
+      "call_count": 1,
+      "total_invocation_bytes": 21,
+      "total_output_bytes": 3904,
+      "total_output_images": 0,
+      "approx_ant_tokens": 976
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 2,
+      "total_invocation_bytes": 244,
+      "total_output_bytes": 1548,
+      "total_output_images": 0,
+      "approx_ant_tokens": 386
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 213,
+      "total_output_bytes": 852,
+      "total_output_images": 0,
+      "approx_ant_tokens": 213
+    },
+    {
+      "tool_name": "exec",
+      "call_count": 2,
+      "total_invocation_bytes": 128,
+      "total_output_bytes": 837,
+      "total_output_images": 0,
+      "approx_ant_tokens": 209
+    },
+    {
+      "tool_name": "devin_inbox_manage",
+      "action": "list",
+      "call_count": 1,
+      "total_invocation_bytes": 17,
+      "total_output_bytes": 128,
+      "total_output_images": 0,
+      "approx_ant_tokens": 32
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 3,
+      "total_invocation_bytes": 197,
+      "total_output_bytes": 36,
+      "total_output_images": 0,
+      "approx_ant_tokens": 9
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 1,
+      "total_invocation_bytes": 145,
+      "total_output_bytes": 21,
+      "total_output_images": 0,
+      "approx_ant_tokens": 5
+    }
+  ],
+  "per_source_context_bytes": {
+    "footer": 1024,
+    "knowledge": 4969,
+    "testing_agent": 5022,
+    "skills": 2013,
+    "shared_files": 375,
+    "agent_init": 7303,
+    "memory_drive": 2363,
+    "env_info": 2137,
+    "slack_readiness": 125,
+    "system": 354,
+    "sysprompt": 26436,
+    "plugins": 1189
+  },
+  "total_main_chain_growth_bytes": 122651
+}
+
+--- event-01a1fdddff8979b0b4546c4e7d318936 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:06 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:29:06.953000Z",
+  "harness_ms": 31.922060999999758,
+  "iteration": 14,
+  "total_ms": 4064.9843399999995,
+  "inference_ms": 2947.0622789999998,
+  "ttft_ms": 1819.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 1086.0
+}
+
+--- event-01a1fdddff9676108e358105ab18ab4d ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:06 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:29:06.966000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fdde045c7b42b1c9207bddf549a1 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:08 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:29:08.188000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fdde045c7b42b1c920838acdcd7d ---
+  type: devin_message (message)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:08 UTC
+  contents: {
+  "type": "devin_message",
+  "timestamp": "2026-11-21T11:29:08.188000Z",
+  "message": "The ticket doesn\u2019t contain a request yet, so I\u2019m waiting for the forwarded message before making changes.",
+  "sign_in": false,
+  "has_content": true,
+  "question_only": false
+}
+
+--- event-01a1fdde074e7493bf5c2cc7046ef1c3 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:08 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:29:08.942000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fdde074f7c70a943ea60b4129253 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:08 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:29:08.943000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fdde074f7c70a943ea7b3a92167b ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:08 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:29:08.943000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fdde074f7c70a943ea8b5aa5d721 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:08 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:29:08.943000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-a40eaef0dc734d35932c4b0ef7855173"
+}
+
+--- event-01a1fdde07607fa3818720150d358e31 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:08 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:29:08.960000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fdde076170e3911d56e5ace7d2a8 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:08 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:29:08.961000Z",
+  "harness_ms": 17.173795000000155,
+  "iteration": 15,
+  "total_ms": 2007.334853,
+  "inference_ms": 1990.161058,
+  "ttft_ms": 1218.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 0.0
+}
+
+--- event-01a1fdde076e75a1bf412c920b9f1369 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:08 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:29:08.974000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fdde0bd97ad39e7b99b33255b643 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:10 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:29:10.105000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fdde0bd97ad39e7b99cd36594573 ---
+  type: devin_message (message)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:10 UTC
+  contents: {
+  "type": "devin_message",
+  "timestamp": "2026-11-21T11:29:10.105000Z",
+  "message": "The [workspace ticket](https://app.devin.ai/sessions/77269590701c45bb99e829357edc251a) says the task will follow, but I haven\u2019t received it. Please forward the requester\u2019s message so I can start.",
+  "thread_id": "session:ccfb704bd1d0430a99132fec8e68c3f1",
+  "sign_in": false,
+  "has_content": true,
+  "question_only": false
+}
+
+--- event-01a1fdde10ff70428468e112e72a944d ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:11 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:29:11.423000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fdde11007cf0b2cc23a0f485919b ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:11 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:29:11.424000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fdde11007cf0b2cc23b88bf9684e ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:11 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:29:11.424000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fdde11007cf0b2cc23cbfaba9fc4 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:11 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:29:11.424000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-c192edad86054673956dea7149d92177"
+}
+
+--- event-01a1fdde11127d60a55fb4b870b1e5d5 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:11 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:29:11.442000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fdde11127d60a55fb4c8d2c59b11 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:11 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:29:11.442000Z",
+  "harness_ms": 18.23157499999934,
+  "iteration": 16,
+  "total_ms": 2480.6384399999997,
+  "inference_ms": 2462.4068650000004,
+  "ttft_ms": 1126.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 0.0
+}
+
+--- event-01a1fdde111f7c80b4056a0bdb795d63 ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:11 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T11:29:11.455000Z",
+  "message": "Waiting for your response",
+  "source": "agent",
+  "enum": "blocked",
+  "num_live_subagents": 0,
+  "user_action_required": "Forward request"
+}
+
+--- event-01a1fdde111f7c80b4056a13ca87216c ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:11 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T11:29:11.455000Z",
+  "iteration": 1,
+  "last_processed_incoming_event_id": "event-01a1fddba3e5732893ba394f4a7d065b",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T11:26:33.860792Z",
+    "seen_event_ids": [
+      "event-01a1fddba3457f8ab622b199e2ad9d77",
+      "event-01a1fddba3867d76ac6a7ea082136ec5",
+      "event-01a1fddba3e5732893ba394f4a7d065b"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fdde11b2763184993b3db61cc05d ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:29:11 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T11:29:11.602000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fddba3e5732893ba394f4a7d065b",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T11:26:33.860792Z",
+      "seen_event_ids": [
+        "event-01a1fddba3457f8ab622b199e2ad9d77",
+        "event-01a1fddba3867d76ac6a7ea082136ec5",
+        "event-01a1fddba3e5732893ba394f4a7d065b"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 1
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/32149132-99c0-4bde-bff4-834fe1406760",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/60a0f9e0-7aa9-45d0-bd88-04dc9895d55c",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/6c77ab1f-75e4-443c-a20b-5b3d708a3b46",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/2ccdb2e2-ed43-4d02-af94-b9641e36422f",
+  "iteration": 1
+}
+
+--- event-01a1fde1131d73c5be91a03bf47b598c ---
+  type: user_message (message)
+  direction: incoming
+  created_at: 2026-11-21 11:32:28 UTC
+  contents: {
+  "type": "user_message",
+  "user_id": "devin-bot",
+  "username": "Workspace Agent",
+  "message": "The attached project.tar.gz is my workspace. Set it up first: `mkdir -p ~/work && tar -xzf project.tar.gz -C ~/work && bash ~/work/bootstrap.sh`. The project is then in ~/work/repo; open new shells with `. ~/.profile`.\n\nFetching the upstream repository fails. Diagnose the saved remote settings, fix them, and verify the local replay.\n\nPlease keep this to about 10 minutes. When you are done, reply with a short summary of what you did.\n\nATTACHMENT:\"https://app.devin.ai/attachments/2be43cb1-b161-4804-b521-0860db222f03/project.tar.gz\"",
+  "origin": "api",
+  "timestamp": "2026-11-21T11:32:28.493429+00:00",
+  "rich_content": null,
+  "sender_devin_session_id": "ccfb704bd1d0430a99132fec8e68c3f1",
+  "sender_bot_id": "bot-0a3cadff30e44a18a8dd031858bc9483",
+  "thread_id": "session:ccfb704bd1d0430a99132fec8e68c3f1",
+  "turn_user_id": "devin-bot",
+  "automated": false
+}
+
+--- event-01a1fde1137b799398485b37f9052ef5 ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:28 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T11:32:28.667000Z",
+  "message": "Devin is thinking...",
+  "source": "agent",
+  "enum": "working",
+  "user_action_required": null
+}
+
+--- event-01a1fde1138b76d0aa59b3651210950d ---
+  type: acu_consumption_at_last_user_interaction (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:28 UTC
+  contents: {
+  "type": "acu_consumption_at_last_user_interaction",
+  "timestamp": "2026-11-21T11:32:28.683000Z",
+  "overage_amount": null,
+  "amount": 0.0
+}
+
+--- event-01a1fde113eb7a51b9b341116bb94883 ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:28 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T11:32:28.779000Z",
+  "message": "Devin is thinking...",
+  "source": "agent",
+  "enum": "working",
+  "user_action_required": null
+}
+
+--- event-01a1fde113f77ef0897cbfa50d54bf89 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:28 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:32:28.791000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fde1188375d2bb05eb35a3f0e185 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:29 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:32:29.955000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fde1188375d2bb05eb40ee26e5b0 ---
+  type: devin_message (message)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:29 UTC
+  contents: {
+  "type": "devin_message",
+  "timestamp": "2026-11-21T11:32:29.955000Z",
+  "message": "I\u2019ll inspect the archive and bootstrap first, then check the saved Git remote settings and verify the local replay if it\u2019s safe to run.",
+  "thread_id": "session:ccfb704bd1d0430a99132fec8e68c3f1",
+  "sign_in": false,
+  "has_content": true,
+  "question_only": false
+}
+
+--- event-01a1fde11bdc77619e5cf853ddd4f77f ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:30 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:32:30.812000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde11bdc77619e5cf86babe6a96b ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:30 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:32:30.812000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fde11bdc77619e5cf87fe64074c5 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:30 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:32:30.812000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fde11bdd7fd0a3a0ab2eaa44e090 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:30 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:32:30.813000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-4d5b186e7d0b4ff2ae2996858028fd2e"
+}
+
+--- event-01a1fde11bee7720bb18914c275ee4a5 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:30 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:32:30.830000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fde11bee7720bb189159a800a642 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:30 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:32:30.830000Z",
+  "main_chain_growth_message_count": 53,
+  "iteration_count": 17,
+  "current_context_tokens": 35770,
+  "current_context_bytes": 126497,
+  "total_tool_output_bytes": 50155,
+  "total_tool_invocation_bytes": 2950,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "scripted_tools",
+      "call_count": 10,
+      "total_invocation_bytes": 1212,
+      "total_output_bytes": 42725,
+      "total_output_images": 0,
+      "approx_ant_tokens": 10678
+    },
+    {
+      "tool_name": "skill_invoke",
+      "call_count": 1,
+      "total_invocation_bytes": 21,
+      "total_output_bytes": 3904,
+      "total_output_images": 0,
+      "approx_ant_tokens": 976
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 2,
+      "total_invocation_bytes": 244,
+      "total_output_bytes": 1548,
+      "total_output_images": 0,
+      "approx_ant_tokens": 386
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 213,
+      "total_output_bytes": 852,
+      "total_output_images": 0,
+      "approx_ant_tokens": 213
+    },
+    {
+      "tool_name": "exec",
+      "call_count": 2,
+      "total_invocation_bytes": 128,
+      "total_output_bytes": 837,
+      "total_output_images": 0,
+      "approx_ant_tokens": 209
+    },
+    {
+      "tool_name": "devin_inbox_manage",
+      "action": "list",
+      "call_count": 1,
+      "total_invocation_bytes": 17,
+      "total_output_bytes": 128,
+      "total_output_images": 0,
+      "approx_ant_tokens": 32
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 4,
+      "total_invocation_bytes": 918,
+      "total_output_bytes": 125,
+      "total_output_images": 0,
+      "approx_ant_tokens": 30
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 3,
+      "total_invocation_bytes": 197,
+      "total_output_bytes": 36,
+      "total_output_images": 0,
+      "approx_ant_tokens": 9
+    }
+  ],
+  "per_source_context_bytes": {
+    "knowledge": 4969,
+    "plugins": 1189,
+    "slack_readiness": 125,
+    "system": 354,
+    "env_info": 2137,
+    "skills": 2013,
+    "sysprompt": 26436,
+    "agent_init": 7303,
+    "memory_drive": 2363,
+    "footer": 2048,
+    "testing_agent": 5022,
+    "shared_files": 375
+  },
+  "total_main_chain_growth_bytes": 124758
+}
+
+--- event-01a1fde11bf07950a21620df1932bbfc ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:30 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:32:30.832000Z",
+  "harness_ms": 17.22831999999994,
+  "iteration": 17,
+  "total_ms": 2052.188014,
+  "inference_ms": 2034.959694,
+  "ttft_ms": 1159.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 0.0
+}
+
+--- event-01a1fde11bfd7110aa0d3263261c23c6 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:30 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:32:30.845000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fde1258077b294305539a0b2034d ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:33 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:32:33.280000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde1258077b294305542d6ea8a85 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:33 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:32:33.280000Z",
+  "tool_name": "scripted_tools",
+  "enum": "executing_actions"
+}

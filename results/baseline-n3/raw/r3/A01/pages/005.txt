@@ -1,0 +1,370 @@
+Event details (22 events):
+Showing 22 (offset=250)
+
+--- event-01a1fdeda08573a0b10386113c58537c ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:11 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:46:11.205000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-b8b973867c5e496ba84789d1c02ce076"
+}
+
+--- event-01a1fdeda0c97ed0aff46ae0c98a9cc5 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:11 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:46:11.273000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fdeda0ca7640bcaa2174d8246e06 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:11 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:46:11.274000Z",
+  "harness_ms": 37.41440999999986,
+  "iteration": 6,
+  "total_ms": 3753.466477,
+  "inference_ms": 3684.052067,
+  "ttft_ms": 3651.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 32.0
+}
+
+--- event-01a1fdeda0ca7640bcaa21899665a80b ---
+  type: shell_process_started (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:11 UTC
+  contents: {
+  "type": "shell_process_started",
+  "timestamp": "2026-11-21T11:46:11.274000Z",
+  "starting_dir": "/home/ubuntu",
+  "process_id": "bb81037d-3c9c-45f4-b3f6-570c12df3da3",
+  "shell_id": "2f2bc0",
+  "command": "ls -la ~/work/session-archive.bin",
+  "is_major_action": true
+}
+
+--- event-01a1fdeda0ca7640bcaa219cec253307 ---
+  type: terminal_update (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:11 UTC
+  contents: {
+  "type": "terminal_update",
+  "timestamp": "2026-11-21T11:46:11.274000Z",
+  "contents": "LXJ3LS0tLS0tLSAxIHVidW50dSB1YnVudHUgNjQ3MDMgTm92IDIxIDExOjQ2IC9ob21lL3VidW50dS93b3JrL3Nlc3Npb24tYXJjaGl2ZS5iaW4NCg==",
+  "shell_id": "2f2bc0",
+  "process_id": "bb81037d-3c9c-45f4-b3f6-570c12df3da3"
+}
+
+--- event-01a1fdeda0ca7640bcaa21bdf7117833 ---
+  type: shell_process_completed (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:11 UTC
+  contents: {
+  "type": "shell_process_completed",
+  "timestamp": "2026-11-21T11:46:11.274000Z",
+  "output_trunc": "-rw------- 1 ubuntu ubuntu 64703 Nov 21 11:46 /home/ubuntu/work/session-archive.bin\n",
+  "process_id": "bb81037d-3c9c-45f4-b3f6-570c12df3da3",
+  "process_uuid": "bb81037d-3c9c-45f4-b3f6-570c12df3da3",
+  "exit_code": "0"
+}
+
+--- event-01a1fdeda0d67771b6a7852418d1de0b ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:11 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:46:11.286000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fdeda2fe7653b7b5783062dd9ca6 ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:11 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:46:11.838000Z",
+  "short": "Verifying archive creation",
+  "summary": "Verifying encrypted archive file creation"
+}
+
+--- event-01a1fdedaead7ca1844569990c55ecd2 ---
+  type: devin_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:14 UTC
+  contents: {
+  "type": "devin_thoughts",
+  "timestamp": "2026-11-21T11:46:14.829000Z",
+  "message": "I'm going to attach to the dispatcher thread and send my update there, since the dispatcher is the one who requested it. The main chat milestone is already handled, so one message to the thread should be enough.",
+  "seen_event_id": "event-01a1fdeda0db78809847da79b0b73905",
+  "thinking_duration_ms": 5358,
+  "has_content": true
+}
+
+--- event-01a1fdedaead7ca1844569a8f7160b9c ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:14 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:46:14.829000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fdedaead7ca1844569b4afad8d20 ---
+  type: devin_message (message)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:14 UTC
+  contents: {
+  "type": "devin_message",
+  "timestamp": "2026-11-21T11:46:14.829000Z",
+  "message": "collect.sh produced the encrypted session archive, attached. It contains the repo, its local remote and the shell logs for this task. Before running it I checked those logs: they hold no credentials. The only secret-like value is the DB password from the workspace's own `.env`.\n\nATTACHMENT:{\"url\":\"https://app.devin.ai/attachments/fdb38c6b-44c6-40b6-b279-81b28a48ff36/session-archive.bin\",\"fileSize\":64703}",
+  "thread_id": "session:ccfb704bd1d0430a99132fec8e68c3f1",
+  "sign_in": false,
+  "has_content": true,
+  "question_only": false
+}
+
+--- event-01a1fdedb5c977d1bca307f542a8dfc9 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:16 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:46:16.649000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fdedb5ca78a294b69b4af0f74010 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:16 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:46:16.650000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fdedb5ca78a294b69b5850a4c49e ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:16 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:46:16.650000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fdedb5cb7d508267ee819c59bb65 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:16 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:46:16.651000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-43c57161ac7f4dcd8da59eb0c78203dd"
+}
+
+--- event-01a1fdedb65b7180a5cb5255416087e6 ---
+  type: attachment_live_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:16 UTC
+  contents: {
+  "type": "attachment_live_update",
+  "timestamp": "2026-11-21T11:46:16.795000Z",
+  "attachments": [
+    {
+      "url": "https://app.devin.ai/attachments/fdb38c6b-44c6-40b6-b279-81b28a48ff36/session-archive.bin",
+      "filename": "session-archive.bin",
+      "path": "/home/ubuntu/work/session-archive.bin",
+      "hash": "fc8545c43c135fbbb1c36f980f2a57208ada6f893c490d083727539dbf6c1e92",
+      "uploads": 0,
+      "uploaded_at": "2026-11-21T11:46:16.795Z"
+    }
+  ]
+}
+
+--- event-01a1fdedb855757295b912e4fe89447c ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:17 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:46:17.301000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fdedb85674728c938c9547605a2b ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:17 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:46:17.302000Z",
+  "main_chain_growth_message_count": 60,
+  "iteration_count": 19,
+  "current_context_tokens": 78042,
+  "current_context_bytes": 128235,
+  "total_tool_output_bytes": 21793,
+  "total_tool_invocation_bytes": 5646,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 13,
+      "total_invocation_bytes": 3069,
+      "total_output_bytes": 19532,
+      "total_output_images": 0,
+      "approx_ant_tokens": 4880
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 285,
+      "total_output_bytes": 990,
+      "total_output_images": 0,
+      "approx_ant_tokens": 247
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 774,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 7,
+      "total_invocation_bytes": 2108,
+      "total_output_bytes": 484,
+      "total_output_images": 0,
+      "approx_ant_tokens": 120
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 1,
+      "total_invocation_bytes": 62,
+      "total_output_bytes": 13,
+      "total_output_images": 0,
+      "approx_ant_tokens": 3
+    }
+  ],
+  "per_source_context_bytes": {
+    "system": 354,
+    "skills": 2013,
+    "testing_agent": 5022,
+    "agent_init": 7303,
+    "memory_drive": 2363,
+    "sidekick": 4063,
+    "sysprompt": 26625,
+    "plugins": 1189,
+    "slack_readiness": 125,
+    "shared_files": 375,
+    "footer": 6406,
+    "knowledge": 5272,
+    "env_info": 2137
+  },
+  "total_main_chain_growth_bytes": 117849
+}
+
+--- event-01a1fdedb85674728c938caf482950d1 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:17 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:46:17.302000Z",
+  "harness_ms": 31.987567000000126,
+  "iteration": 7,
+  "total_ms": 6027.595274,
+  "inference_ms": 5376.607707,
+  "ttft_ms": 3536.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 619.0
+}
+
+--- event-01a1fdedb8647af1af93b52f4aa52c37 ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:17 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T11:46:17.316000Z",
+  "message": "Waiting for your response",
+  "source": "agent",
+  "enum": "blocked",
+  "num_live_subagents": 0,
+  "user_action_required": null
+}
+
+--- event-01a1fdedb8647af1af93b53854a940c4 ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:17 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T11:46:17.316000Z",
+  "iteration": 3,
+  "last_processed_incoming_event_id": "event-01a1fdebb9847c499b8cf63831a78f19",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T11:44:48.118090Z",
+    "seen_event_ids": [
+      "event-01a1fddafd107aa0a5d38e98b7d90dc9",
+      "event-01a1fddafd597b50ad602fa175667128",
+      "event-01a1fddafdce76f1b49131ca5dc16529",
+      "event-01a1fde0da2b7b93a681ee0714428fee",
+      "event-01a1fdebb9847c499b8cf63831a78f19",
+      "event-01a1fdec58ec77819b072b86228bf277"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fdedb936759286a39dc586b1e90c ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:46:17 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T11:46:17.526000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fdebb9847c499b8cf63831a78f19",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T11:44:48.118090Z",
+      "seen_event_ids": [
+        "event-01a1fddafd107aa0a5d38e98b7d90dc9",
+        "event-01a1fddafd597b50ad602fa175667128",
+        "event-01a1fddafdce76f1b49131ca5dc16529",
+        "event-01a1fde0da2b7b93a681ee0714428fee",
+        "event-01a1fdebb9847c499b8cf63831a78f19",
+        "event-01a1fdec58ec77819b072b86228bf277"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 3
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/ca1da1b8-0865-4640-9bb8-866073c8bf8e",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/c5fe2e5e-3524-43b9-ad0f-db4132277afb",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/c4377fe2-cb2b-4d4f-92d9-9fa8b561784a",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/03ab0495-a2cc-44a1-95b3-01eab076b125",
+  "iteration": 3
+}

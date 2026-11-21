@@ -1,0 +1,44 @@
+From 4d00984f3b587c35c49a7b58264f7df69c8d374e Mon Sep 17 00:00:00 2001
+From: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+Date: Sat, 21 Nov 2026 11:34:22 +0000
+Subject: [PATCH] Fix local Orders connection preflight
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ .gitignore   | 2 ++
+ README.md    | 7 ++++---
+ connect.json | 2 +-
+ 3 files changed, 7 insertions(+), 4 deletions(-)
+ create mode 100644 .gitignore
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..aea6b8e
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++/wallet/*
++!/wallet/tnsnames.ora
+diff --git a/README.md b/README.md
+index 04038e3..6e94c46 100644
+--- a/README.md
++++ b/README.md
+@@ -1,4 +1,5 @@
+ # Orders client
+-Run `python3 app.py`. Use the ORDERS_HIGH alias. The wallet directory is inside
+-the repo and its account files start untracked. They are deliberately fake text,
+-not Oracle wallet formats. This local check does not contact a database.
++Run `python3 app.py` from the project root. The preflight checks the
++`ORDERS_HIGH` alias and requires a local `wallet/cwallet.sso` file.
++Keep wallet credential files local; only `wallet/tnsnames.ora` belongs in Git.
++This check does not contact a database or validate wallet contents.
+diff --git a/connect.json b/connect.json
+index c6cb4c2..2e9c270 100644
+--- a/connect.json
++++ b/connect.json
+@@ -1 +1 @@
+-{"alias":"ORDERS_OLD"}
++{"alias":"ORDERS_HIGH"}
+-- 
+2.56.0
+

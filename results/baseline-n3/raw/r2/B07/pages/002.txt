@@ -1,0 +1,904 @@
+Event details (50 events):
+Showing 50 (offset=100)
+More events may exist. Use offset=150 to fetch the next batch (an empty result means you have reached the end).
+
+--- event-01a1fde18851767294d7bfe874799b25 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:58 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:32:58.577000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fde1899f7591bf920667f34a7fbb ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:58 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:32:58.911000Z",
+  "short": "Testing TTL boundary",
+  "summary": "Testing auth TTL boundary behavior"
+}
+
+--- event-01a1fde1aa6b7953897a69e1ea2bb5f8 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:07 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:07.307000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde1aa6b7953897a69fc53c6d477 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:07 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:07.307000Z",
+  "tool_name": "exec",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fde1aa6b7953897a6a02922bc2af ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:07 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:33:07.307000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-c8929430322540dd9841b73b473cf715"
+}
+
+--- event-01a1fde1aabd7e33b2e71cd6e05e142e ---
+  type: shell_process_started (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:07 UTC
+  contents: {
+  "type": "shell_process_started",
+  "timestamp": "2026-11-21T11:33:07.389000Z",
+  "chain": [
+    {
+      "command": ". ~/.profile",
+      "certainly_ran": true,
+      "start": 0,
+      "end": 12
+    },
+    {
+      "command": "cat > BUGREPORT.md <<'EOF'\n# Bug: auth sessions outlive their one-hour lifetime\n\n## Summary\nSessions are meant to expire after one hour, but much older sessions are still\naccepted. `settings.yaml` stores `token_ttl` in **milliseconds** (`3600000`),\nwhile `auth.py` compares it against a token age in **seconds**. The effective\nlifetime is therefore 3,600,000 s (~41.7 days) instead of 3,600 s (1 hour).\n\n## Relevant configuration\n`settings.yaml` (secret redacted):\n\n```yaml\njwt_secret: \"<redacted>\"\ntoken_ttl: 3600000   # written in milliseconds by the config producer\nissuer: local-auth\n```\n\nConsumer check in `auth.py`:\n\n```python\nreturn bool(signature) and age_seconds < int(cfg[\"token_ttl\"])\n```\n\n`age_seconds` is in seconds; `token_ttl` is used as-is with no unit conversion.\n\n## Reproduction\n```sh\npython3 auth.py\n# two-hour-old session accepted: True\n```\n\nBoundary check (same `accepts()` function):\n\n| Session age (s) | Expected | Actual |\n|---|---|---|\n| 3599 | accepted | accepted |\n| 3600 | rejected | accepted |\n| 7200 (2 h) | rejected | accepted |\n| 3599999 (~41.7 days) | rejected | accepted |\n| 3600000 | rejected | rejected |\n\n## Expected vs actual\n- Expected: sessions with age >= 3600 s are rejected.\n- Actual: sessions are accepted until age reaches 3,600,000 s.\n\n## Impact\nStolen or stale session tokens stay valid ~1000x longer than intended.\n\n## Suggested fix\nAgree on one unit for `token_ttl`. Either have the producer write seconds\n(`token_ttl: 3600`), or have the consumer convert (`int(cfg[\"token_ttl\"]) // 1000`)\nand rename the key to make the unit explicit (e.g. `token_ttl_ms`).\n\n## Notes\nThis is a local HMAC/lifetime replay, not a full JWT server, so it covers the\nlifetime comparison only.\nEOF",
+      "certainly_ran": true,
+      "start": 30,
+      "end": 1755
+    },
+    {
+      "command": "git checkout -q -b bugreport-token-ttl && git add BUGREPORT.md && git commit -qm \"Add BUGREPORT.md for session lifetime unit mismatch\" && git push -q origin bugreport-token-ttl 2>&1; git status --short",
+      "certainly_ran": false,
+      "start": 1756,
+      "end": 1957
+    },
+    {
+      "command": "grep -c utxh BUGREPORT.md",
+      "certainly_ran": true,
+      "start": 1959,
+      "end": 1984,
+      "operation": {
+        "kind": "search",
+        "patterns": [
+          "utxh"
+        ],
+        "paths": [
+          "BUGREPORT.md"
+        ]
+      }
+    }
+  ],
+  "process_id": "e8721cc8-2b41-473c-aec9-16b573d20c33",
+  "shell_id": "911274",
+  "command": ". ~/.profile; cd ~/work/repo; cat > BUGREPORT.md <<'EOF'\n# Bug: auth sessions outlive their one-hour lifetime\n\n## Summary\nSessions are meant to expire after one hour, but much older sessions are still\naccepted. `settings.yaml` stores `token_ttl` in **milliseconds** (`3600000`),\nwhile `auth.py` compares it against a token age in **seconds**. The effective\nlifetime is therefore 3,600,000 s (~41.7 days) instead of 3,600 s (1 hour).\n\n## Relevant configuration\n`settings.yaml` (secret redacted):\n\n```yaml\njwt_secret: \"<redacted>\"\ntoken_ttl: 3600000   # written in milliseconds by the config producer\nissuer: local-auth\n```\n\nConsumer check in `auth.py`:\n\n```python\nreturn bool(signature) and age_seconds < int(cfg[\"token_ttl\"])\n```\n\n`age_seconds` is in seconds; `token_ttl` is used as-is with no unit conversion.\n\n## Reproduction\n```sh\npython3 auth.py\n# two-hour-old session accepted: True\n```\n\nBoundary check (same `accepts()` function):\n\n| Session age (s) | Expected | Actual |\n|---|---|---|\n| 3599 | accepted | accepted |\n| 3600 | rejected | accepted |\n| 7200 (2 h) | rejected | accepted |\n| 3599999 (~41.7 days) | rejected | accepted |\n| 3600000 | rejected | rejected |\n\n## Expected vs actual\n- Expected: sessions with age >= 3600 s are rejected.\n- Actual: sessions are accepted until age reaches 3,600,000 s.\n\n## Impact\nStolen or stale session tokens stay valid ~1000x longer than intended.\n\n## Suggested fix\nAgree on one unit for `token_ttl`. Either have the producer write seconds\n(`token_ttl: 3600`), or have the consumer convert (`int(cfg[\"token_ttl\"]) // 1000`)\nand rename the key to make the unit explicit (e.g. `token_ttl_ms`).\n\n## Notes\nThis is a local HMAC/lifetime replay, not a full JWT server, so it covers the\nlifetime comparison only.\nEOF\ngit checkout -q -b bugreport-token-ttl && git add BUGREPORT.md && git commit -qm \"Add BUGREPORT.md for session lifetime unit mismatch\" && git push -q origin bugreport-token-ttl 2>&1; git status --short; grep -c utxh BUGREPORT.md",
+  "starting_dir": "/home/ubuntu",
+  "is_major_action": true
+}
+
+--- event-01a1fde1aabd7e33b2e71ce6c7139bdb ---
+  type: terminal_update (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:07 UTC
+  contents: {
+  "type": "terminal_update",
+  "timestamp": "2026-11-21T11:33:07.389000Z",
+  "contents": "DQoNCldBUk5JTkc6IFlvdSBoYXZlIHVuc3RhZ2VkIGNoYW5nZXMgaW4geW91ciBnaXQgcmVwby4gUGxlYXNlIHN0YWdlIGFsbCBmaWxlcyB5b3Ugd2FudCB0byBjb21taXQuDQoNCj8/IHNldHRpbmdzLnlhbWwNCjANCg==",
+  "shell_id": "911274",
+  "process_id": "e8721cc8-2b41-473c-aec9-16b573d20c33"
+}
+
+--- event-01a1fde1aade74a082605aafd55359b7 ---
+  type: shell_process_completed (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:07 UTC
+  contents: {
+  "type": "shell_process_completed",
+  "timestamp": "2026-11-21T11:33:07.422000Z",
+  "output_trunc": "\n\nWARNING: You have unstaged changes in your git repo. Please stage all files you want to commit.\n\n?? settings.yaml\n0\n",
+  "process_id": "e8721cc8-2b41-473c-aec9-16b573d20c33",
+  "process_uuid": "e8721cc8-2b41-473c-aec9-16b573d20c33",
+  "exit_code": "1"
+}
+
+--- event-01a1fde1aaec7ea38d9bfc59c0d883be ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:07 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:07.436000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fde1aaec7ea38d9bfc644b14f765 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:07 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:33:07.436000Z",
+  "main_chain_growth_message_count": 39,
+  "iteration_count": 8,
+  "current_context_tokens": 58124,
+  "current_context_bytes": 78641,
+  "total_tool_output_bytes": 6586,
+  "total_tool_invocation_bytes": 3641,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 5,
+      "total_invocation_bytes": 2872,
+      "total_output_bytes": 5695,
+      "total_output_images": 0,
+      "approx_ant_tokens": 1422
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 774,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 3,
+      "total_invocation_bytes": 581,
+      "total_output_bytes": 104,
+      "total_output_images": 0,
+      "approx_ant_tokens": 25
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 1,
+      "total_invocation_bytes": 66,
+      "total_output_bytes": 13,
+      "total_output_images": 0,
+      "approx_ant_tokens": 3
+    }
+  ],
+  "per_source_context_bytes": {
+    "system": 354,
+    "plugins": 1189,
+    "env_info": 2137,
+    "skills": 2013,
+    "shared_files": 375,
+    "footer": 3413,
+    "knowledge": 5272,
+    "sysprompt": 26625,
+    "sidekick": 4063,
+    "agent_init": 7303,
+    "memory_drive": 2363,
+    "slack_readiness": 125,
+    "testing_agent": 5022
+  },
+  "total_main_chain_growth_bytes": 77495
+}
+
+--- event-01a1fde1aaec7ea38d9bfc78e4c6ef10 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:07 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:33:07.436000Z",
+  "harness_ms": 47.50903400000061,
+  "iteration": 8,
+  "total_ms": 8873.092978,
+  "inference_ms": 8741.583944,
+  "ttft_ms": 1280.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 84.0
+}
+
+--- event-01a1fde1aafa7be0ad3cc99f00ea0944 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:07 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:07.450000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fde1ab417dc08cfa468c96dcbba0 ---
+  type: multi_edit_result (file)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:07 UTC
+  contents: {
+  "type": "multi_edit_result",
+  "timestamp": "2026-11-21T11:33:07.521000Z",
+  "is_major_action": true,
+  "file_updates": [
+    {
+      "action_type": "create",
+      "file_path": "/home/ubuntu/work/repo/BUGREPORT.md",
+      "lines_added": 56,
+      "contents_key": "editor_files/devin-204b8f6d2be34c5f85406a02df643025/f0677611-91e2-47c9-b9c7-b63b5a2b6bee.txt"
+    }
+  ],
+  "has_write": true,
+  "action_uuid": "toolu_01XFKvxyufaMf9gksBezuh5c",
+  "edited_by_process_id": "e8721cc8-2b41-473c-aec9-16b573d20c33"
+}
+
+--- event-01a1fde1b35577d18ab7864737e1e72e ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:09 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:33:09.589000Z",
+  "short": "Writing lifetime bug report",
+  "summary": "Writing and publishing the auth lifetime bug report"
+}
+
+--- event-01a1fde1b5947d83a7ffb099b16bee56 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:10 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:10.164000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde1b5947d83a7ffb0a85e3d14ca ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:10 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:10.164000Z",
+  "tool_name": "exec",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fde1b5957c82a3191856df489f9d ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:10 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:33:10.165000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-bc5ffe488fd54158b4b659391e68bdd0"
+}
+
+--- event-01a1fde1b5d27c30822465483fc52691 ---
+  type: shell_process_started (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:10 UTC
+  contents: {
+  "type": "shell_process_started",
+  "timestamp": "2026-11-21T11:33:10.226000Z",
+  "chain": [
+    {
+      "command": "git log --oneline -2; git ls-remote origin",
+      "certainly_ran": true,
+      "start": 16,
+      "end": 58
+    }
+  ],
+  "process_id": "07486163-4dd5-4f17-b841-66b05bea6094",
+  "shell_id": "3f2369",
+  "command": "cd ~/work/repo; git log --oneline -2; git ls-remote origin",
+  "starting_dir": "/home/ubuntu",
+  "is_major_action": true
+}
+
+--- event-01a1fde1b5d27c308224655c8fb0ba5c ---
+  type: terminal_update (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:10 UTC
+  contents: {
+  "type": "terminal_update",
+  "timestamp": "2026-11-21T11:33:10.226000Z",
+  "contents_gzip": "H4sIAAAAAAAC/5WOTW7CMBBG10TKHeYClNgdO86SqqjtqhVqD+CfmeI2jpFt7g8SEmLL9vuk9x6TZG88bEOAl5+3/e7rc//9lAJwLlCp1pgXmCNTi4ngtMQGKdZkmz/0nWD0wQ7wcZmjneFY8h/5djuMM3r0QuPAKBC9FajUpKUcjCHl2Kzed9vXvuNrxKC1QcejcVK4UeEknBqnYJ9RCCSl5KoQ182BbKgbd/otdMylrVv+p2Xd2vyA9w6UbFz67gzTTwwKCAEAAA==",
+  "shell_id": "3f2369",
+  "process_id": "07486163-4dd5-4f17-b841-66b05bea6094"
+}
+
+--- event-01a1fde1b5d87ac3828b7824169de441 ---
+  type: shell_process_completed (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:10 UTC
+  contents: {
+  "type": "shell_process_completed",
+  "timestamp": "2026-11-21T11:33:10.232000Z",
+  "output_trunc": "fe2fc8c Add BUGREPORT.md for session lifetime unit mismatch\n1f4cda0 Initial project\n1f4cda08b867c1640f4144ca14559622088e5bf8\tHEAD\nfe2fc8c06684bf78b21b75491b579da34114e552\trefs/heads/bugreport-token-ttl\n1f4cda08b867c1640f4144ca14559622088e5bf8\trefs/heads/main\n",
+  "process_id": "07486163-4dd5-4f17-b841-66b05bea6094",
+  "process_uuid": "07486163-4dd5-4f17-b841-66b05bea6094",
+  "exit_code": "0"
+}
+
+--- event-01a1fde1b5dc7413b9d99c800e7b1168 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:10 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:10.236000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fde1b5dd763187663e58f9834917 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:10 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:33:10.237000Z",
+  "harness_ms": 35.10209799999984,
+  "iteration": 9,
+  "total_ms": 2799.7224539999997,
+  "inference_ms": 2725.620356,
+  "ttft_ms": 2214.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 39.0
+}
+
+--- event-01a1fde1b5ea70e1a2f79cff456d4f69 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:10 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:10.250000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fde1c3647f209e4d9eec8e01a0f7 ---
+  type: devin_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:13 UTC
+  contents: {
+  "type": "devin_thoughts",
+  "timestamp": "2026-11-21T11:33:13.700000Z",
+  "message": "The branch is pushed, but it lives only on a local bare remote, so I can't open a GitHub PR. Next I'll update the ticket and let main and the thread know.",
+  "seen_event_id": "event-01a1fde1b5ef7d619cb2179b6d806a26",
+  "thinking_duration_ms": 6226,
+  "has_content": true
+}
+
+--- event-01a1fde1ce427633b1a9b2fab4734e89 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:16 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:16.482000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde1ce427633b1a9b30a184dfc8a ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:16 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:16.482000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fde1ce4376c38cb6831ed2d5fc78 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:16 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:33:16.483000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-9ad491cab83e46d085ea06f85497846b"
+}
+
+--- event-01a1fde1ce567ae2930eddf3679054e4 ---
+  type: mcp_tool_call_started (mcp)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:16 UTC
+  contents: {
+  "type": "mcp_tool_call_started",
+  "timestamp": "2026-11-21T11:33:16.502000Z",
+  "shell_id": "mcp-http-call-devin-mcp-a0fe6d71",
+  "server": "devin_mcp",
+  "tool_name": "devin_ticket_manage",
+  "tool_input": "{\"action\":\"update\",\"board_id\":\"board-8e8f8cd4bd4e4cea851e85028302ef0d\",\"ticket_id\":\"ticket-6cd1e17c97134b5e9f412f2fbed8e184\",\"status_update\":\"Wrote BUGREPORT.md (token_ttl ms vs seconds mismatch: repro, redacted config, fix). Pushed to branch bugreport-token-ttl on the workspace's local remote. No PR possible because the remote isn't on GitHub.\",\"status\":\"In review\"}",
+  "display_name": "Devin MCP",
+  "card": false
+}
+
+--- event-01a1fde1d2a67001b571966dc52b576f ---
+  type: mcp_tool_call (mcp)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:17 UTC
+  contents: {
+  "type": "mcp_tool_call",
+  "timestamp": "2026-11-21T11:33:17.606000Z",
+  "result_meta": {
+    "fastmcp": {
+      "wrap_result": true
+    }
+  },
+  "server": "devin_mcp",
+  "tool_name": "devin_ticket_manage",
+  "tool_input": "{\"action\":\"update\",\"board_id\":\"board-8e8f8cd4bd4e4cea851e85028302ef0d\",\"ticket_id\":\"ticket-6cd1e17c97134b5e9f412f2fbed8e184\",\"status_update\":\"Wrote BUGREPORT.md (token_ttl ms vs seconds mismatch: repro, redacted config, fix). Pushed to branch bugreport-token-ttl on the workspace's local remote. No PR possible because the remote isn't on GitHub.\",\"status\":\"In review\"}",
+  "exit_code": 0,
+  "shell_id": "mcp-http-call-devin-mcp-a0fe6d71",
+  "output_trunc": "Ticket updated: ticket-6cd1e17c97134b5e9f412f2fbed8e184\n\nTicket ID: ticket-6cd1e17c97134b5e9f412f2fbed8e184\nKey: TASK-80\nBoard ID: board-8e8f8cd4bd4e4cea851e85028302ef0d\nTitle: Workspace task\nStatus: status-c48fc90d899547e1b94bc16dfc5d0085 (category: started, color: #4ea7fc)\nPriority: none (0)\nAssignee: (unassigned)\nClaimed by: devin-204b8f6d2be34c5f85406a02df643025\nSort order: 1795248809907.466\nEstimate: (none)\nBlocked by: (none)\nBlocks: (none)\nCustom fields: (none)\nTags:\n  - folder: Batch 2 runs (tag-7eb96bd90ff14ac2bcba2b31c93b097b)\nResources: (none)\nCreated by: user:service-user-0e4823e66bb645e4a1c728ceb66d8004\nCreated: 2026-11-21T11:27:19.680037Z\nUpdated: 2026-11-21T11:33:17.368159Z\nVersion: 3\n\nDescription:\n<!-- devin-status -->\nWrote BUGREPORT.md (token_ttl ms vs seconds mismatch: repro, redacted config, fix). Pushed to branch bugreport-token-ttl on the workspace's local remote. No PR possible because the remote isn't on GitHub.\n\n---\n\nA message with the task follows.",
+  "card": false
+}
+
+--- event-01a1fde1d2a77591aa65195b2471b585 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:17 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:17.607000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fde1d2a77591aa65196115a487b9 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:17 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:33:17.607000Z",
+  "main_chain_growth_message_count": 45,
+  "iteration_count": 10,
+  "current_context_tokens": 59456,
+  "current_context_bytes": 81871,
+  "total_tool_output_bytes": 7883,
+  "total_tool_invocation_bytes": 4082,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 6,
+      "total_invocation_bytes": 2944,
+      "total_output_bytes": 6005,
+      "total_output_images": 0,
+      "approx_ant_tokens": 1499
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 369,
+      "total_output_bytes": 987,
+      "total_output_images": 0,
+      "approx_ant_tokens": 246
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 774,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 3,
+      "total_invocation_bytes": 581,
+      "total_output_bytes": 104,
+      "total_output_images": 0,
+      "approx_ant_tokens": 25
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 1,
+      "total_invocation_bytes": 66,
+      "total_output_bytes": 13,
+      "total_output_images": 0,
+      "approx_ant_tokens": 3
+    }
+  ],
+  "per_source_context_bytes": {
+    "skills": 2013,
+    "plugins": 1189,
+    "footer": 3739,
+    "env_info": 2137,
+    "wording_ref_hint": 221,
+    "slack_readiness": 125,
+    "shared_files": 375,
+    "system": 354,
+    "sidekick": 4063,
+    "knowledge": 5272,
+    "agent_init": 7303,
+    "sysprompt": 26625,
+    "testing_agent": 5022,
+    "memory_drive": 2363
+  },
+  "total_main_chain_growth_bytes": 82065
+}
+
+--- event-01a1fde1d2a77591aa651977f16046d1 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:17 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:33:17.607000Z",
+  "num_tool_calls": 2,
+  "iteration": 10,
+  "total_ms": 7370.128925999999,
+  "inference_ms": 6244.458433,
+  "ttft_ms": 3444.0
+}
+
+--- event-01a1fde1d2b77ae38320e7d405af1002 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:17 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:17.623000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fde1d68c79a2a0a653ec49159326 ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:18 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:33:18.604000Z",
+  "short": "Notifying ticket and user",
+  "summary": "Notifying ticket and user"
+}
+
+--- event-01a1fde1d7d27721ac168df590abe507 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:18 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:33:18.930000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fde1d7d27721ac168e0139f0f654 ---
+  type: devin_message (message)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:18 UTC
+  contents: {
+  "type": "devin_message",
+  "timestamp": "2026-11-21T11:33:18.930000Z",
+  "message": "I wrote BUGREPORT.md. Sessions outlive their 1-hour lifetime because `settings.yaml` sets `token_ttl: 3600000` in milliseconds, while `auth.py` compares session age in seconds. The real lifetime is about 41.7 days. The report has a repro (`python3 auth.py`), a boundary table, the config with `jwt_secret` redacted, and a suggested fix.\n\nIt's committed on branch `bugreport-token-ttl` and pushed to the workspace's local remote. There's no PR because that remote isn't on GitHub. I didn't commit `settings.yaml` because it holds the secret.\n\nATTACHMENT:{\"url\":\"https://app.devin.ai/attachments/cc0c2770-3549-4d58-877e-1caf40a539e9/BUGREPORT.md\",\"fileSize\":1695}",
+  "thread_id": "session:ccfb704bd1d0430a99132fec8e68c3f1",
+  "sign_in": false,
+  "has_content": true,
+  "question_only": false
+}
+
+--- event-01a1fde1e2be769099cd117b9920755e ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:21 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:33:21.726000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fde1e2bf75e0be4f45322f6482dc ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:21 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:21.727000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde1e2bf75e0be4f4544a729c32e ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:21 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:21.727000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fde1e2c07e00b7866df0f80a8d5b ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:21 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:33:21.728000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-5dbbb6c3bd0641b6943ed174e4daa2d4"
+}
+
+--- event-01a1fde1e3477b20989f54def605f887 ---
+  type: attachment_live_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:21 UTC
+  contents: {
+  "type": "attachment_live_update",
+  "timestamp": "2026-11-21T11:33:21.863000Z",
+  "attachments": [
+    {
+      "url": "https://app.devin.ai/attachments/cc0c2770-3549-4d58-877e-1caf40a539e9/BUGREPORT.md",
+      "filename": "BUGREPORT.md",
+      "path": "/home/ubuntu/work/repo/BUGREPORT.md",
+      "hash": "7945dace3b3c1f8a57de871b0a92b8f51d708a78b95dd689e7164819bdf99515",
+      "uploads": 0,
+      "uploaded_at": "2026-11-21T11:33:21.863Z"
+    }
+  ]
+}
+
+--- event-01a1fde1e5017c438e1e799325943fdb ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:22.305000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fde1e5027920ab983eedfcd7c094 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:33:22.306000Z",
+  "main_chain_growth_message_count": 47,
+  "iteration_count": 11,
+  "current_context_tokens": 60830,
+  "current_context_bytes": 85967,
+  "total_tool_output_bytes": 8152,
+  "total_tool_invocation_bytes": 4798,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 6,
+      "total_invocation_bytes": 2944,
+      "total_output_bytes": 6005,
+      "total_output_images": 0,
+      "approx_ant_tokens": 1499
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 369,
+      "total_output_bytes": 987,
+      "total_output_images": 0,
+      "approx_ant_tokens": 246
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 774,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 4,
+      "total_invocation_bytes": 1297,
+      "total_output_bytes": 373,
+      "total_output_images": 0,
+      "approx_ant_tokens": 92
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 1,
+      "total_invocation_bytes": 66,
+      "total_output_bytes": 13,
+      "total_output_images": 0,
+      "approx_ant_tokens": 3
+    }
+  ],
+  "per_source_context_bytes": {
+    "sysprompt": 26625,
+    "system": 354,
+    "testing_agent": 5022,
+    "memory_drive": 2363,
+    "skills": 2013,
+    "shared_files": 375,
+    "sidekick": 4063,
+    "agent_init": 7303,
+    "env_info": 2137,
+    "footer": 3902,
+    "wording_ref_hint": 221,
+    "slack_readiness": 125,
+    "knowledge": 5272,
+    "plugins": 1189
+  },
+  "total_main_chain_growth_bytes": 83092
+}
+
+--- event-01a1fde1e5027920ab983ef77f46909d ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:33:22.306000Z",
+  "harness_ms": 37.588096999999834,
+  "iteration": 11,
+  "total_ms": 4697.877909,
+  "inference_ms": 4116.289812,
+  "ttft_ms": 1298.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 544.0
+}
+
+--- event-01a1fde1e51174a396ae29489a055e5f ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T11:33:22.321000Z",
+  "message": "Waiting for your response",
+  "source": "agent",
+  "enum": "blocked",
+  "num_live_subagents": 0,
+  "user_action_required": null
+}
+
+--- event-01a1fde1e5127c108e980b2f054767a8 ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T11:33:22.322000Z",
+  "iteration": 2,
+  "last_processed_incoming_event_id": "event-01a1fde15cee7e0ebaf216aad9301b9f",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T11:32:24.827469Z",
+    "seen_event_ids": [
+      "event-01a1fddc602b78fd89cb92107568b6ad",
+      "event-01a1fddc60927f55ae86e54848437fd1",
+      "event-01a1fddc60fd7bf4877c4e0289817a45",
+      "event-01a1fde15cee7e0ebaf216aad9301b9f"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fde1e5987e13bc1b9fa3ad3ba14b ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T11:33:22.456000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fde15cee7e0ebaf216aad9301b9f",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T11:32:24.827469Z",
+      "seen_event_ids": [
+        "event-01a1fddc602b78fd89cb92107568b6ad",
+        "event-01a1fddc60927f55ae86e54848437fd1",
+        "event-01a1fddc60fd7bf4877c4e0289817a45",
+        "event-01a1fde15cee7e0ebaf216aad9301b9f"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 2
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/373a395b-0eec-497a-b0e2-957049bae31d",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/0d8192eb-02b5-4fe8-a64b-e1f0f48395f2",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/76db24ff-71c0-427a-9f45-c2b150f5ebad",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/23dd13ff-220f-47f6-b36a-30f8205d297c",
+  "iteration": 2
+}
+
+--- event-01a1fde68c8c75e39aac648bfb01b738 ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:38:27 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T11:38:27.340000Z",
+  "iteration": 2,
+  "last_processed_incoming_event_id": "event-01a1fde15cee7e0ebaf216aad9301b9f",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T11:38:22.325330Z",
+    "seen_event_ids": [
+      "event-01a1fddc602b78fd89cb92107568b6ad",
+      "event-01a1fddc60927f55ae86e54848437fd1",
+      "event-01a1fddc60fd7bf4877c4e0289817a45",
+      "event-01a1fde15cee7e0ebaf216aad9301b9f"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fde68d147062b24320a1d4b4b50b ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:38:27 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T11:38:27.476000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fde15cee7e0ebaf216aad9301b9f",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T11:38:22.325330Z",
+      "seen_event_ids": [
+        "event-01a1fddc602b78fd89cb92107568b6ad",
+        "event-01a1fddc60927f55ae86e54848437fd1",
+        "event-01a1fddc60fd7bf4877c4e0289817a45",
+        "event-01a1fde15cee7e0ebaf216aad9301b9f"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 2
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/e5196f78-d4ee-4213-8b87-c855e0263968",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/a8f749bf-c288-4a3d-a3d6-609adf13fd9c",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/d55c5dcd-9bab-440c-8c36-da746fe11353",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/23dd13ff-220f-47f6-b36a-30f8205d297c",
+  "iteration": 2
+}
+
+--- event-01a1fde68d147062b24320bff13ab448 ---
+  type: checkpoint_created (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:38:27 UTC
+  contents: {
+  "type": "checkpoint_created",
+  "timestamp": "2026-11-21T11:38:27.476000Z",
+  "saved_to_s3": true,
+  "checkpoint_id": "rs-checkpoint-devin-204b8f6d2be34c5f85406a02df643025-2"
+}
