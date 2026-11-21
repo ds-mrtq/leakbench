@@ -14,8 +14,28 @@ _lb_capture_record() {
   return 0
 }
 _lb_capture_stream() {
-  local line
+  local line source_text keep=0
   while IFS= read -r line || [[ -n $line ]]; do
+    if [[ $1 == command ]]; then
+      if [[ $line == +*LB-TRACE$'\t'* ]]; then
+        source_text=${line#*LB-TRACE$'\t'}
+        source_text=${source_text%%$'\t'*}
+        line=${line#*LB-TRACE$'\t'}
+        line=${line#*$'\t'}
+        keep=1
+        case " $source_text " in
+          *"/.profile"*|*" .profile "*|\
+          *"/.bashrc"*|*" .bashrc "*|\
+          *"/.bash_profile"*|*" .bash_profile "*|\
+          *"/.bash_login"*|*" .bash_login "*|\
+          *"/.leakbench-shell-init"*|*" .leakbench-shell-init "*|\
+          *"/env.sh"*|*" env.sh "*|\
+          *"/shell-logger.sh"*|*" shell-logger.sh "*|\
+          *"/etc/profile"*|*"/etc/bash.bashrc"*) keep=0 ;;
+        esac
+      fi
+      [[ $keep == 1 ]] || continue
+    fi
     _lb_capture_record "$1" "$line" "$2"
   done
   return 0
@@ -38,7 +58,7 @@ exec {_LB_CAPTURE_OUT}>&- {_LB_CAPTURE_ERR}>&-
 if [[ $- != *x* ]]; then
   exec {_LB_CAPTURE_TRACE}> >(exec >/dev/null 2>&1; _lb_capture_stream command "$_LB_CAPTURE_BASE.commands.lb-log")
   BASH_XTRACEFD=$_LB_CAPTURE_TRACE
-  PS4='+ '
+  PS4=$'+LB-TRACE\t${BASH_SOURCE[*]}\t'
   set -x
 fi
 `

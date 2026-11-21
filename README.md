@@ -48,6 +48,14 @@ exit statuses. DEBUG traps are left alone, existing xtrace is not replaced
 (private command capture is then unavailable), and an already instrumented
 shell is not wrapped again.
 
+Command records exclude startup-file source stacks (`.profile`, `.bashrc`,
+Bash login profiles, the generated initializer/logger and `env.sh`), including
+helpers called from those files. Re-sourcing a profile therefore does not
+turn its environment exports into synthetic exposure. Actual stdout/stderr
+printed by startup files remains observable and is still captured. Capture
+observers do not retain the caller's stdout/stderr descriptors; redirected
+background jobs do not delay shell-output EOF merely by inheriting log FDs.
+
 `collect.sh` archives these logs under `run/shell-logs/` and writes a first-use
 collection timestamp. `lb score` scans parsed log payloads as **exposed only**,
 channel `shell-log`, using the earlier of that marker and the incoming
