@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -119,9 +120,18 @@ func TestRenderScenarios(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := []string{"A01", "A02", "A03", "A06", "B01", "C01", "C07", "D01", "D05", "E01"}
+	var want []string
+	for _, class := range []byte{'A', 'B', 'C', 'D', 'E'} {
+		count := 9
+		if class == 'A' {
+			count = 10
+		}
+		for n := 1; n <= count; n++ {
+			want = append(want, fmt.Sprintf("%c%02d", class, n))
+		}
+	}
 	if len(all) != len(want) {
-		t.Fatalf("want 10 scenarios, got %d", len(all))
+		t.Fatalf("want 46 scenarios, got %d", len(all))
 	}
 	for i, s := range all {
 		if s.ID != want[i] {

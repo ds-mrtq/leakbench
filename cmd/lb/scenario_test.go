@@ -14,7 +14,7 @@ func TestScenarioCommands(t *testing.T) {
 	if err := run([]string{"lint", "--scenarios", root}, &out); err != nil {
 		t.Fatal(err)
 	}
-	if out.String() != "Linted 10 scenarios\n" {
+	if out.String() != "Linted 46 scenarios\n" {
 		t.Fatalf("unexpected lint output %q", out.String())
 	}
 	dest := filepath.Join(t.TempDir(), "rendered")
