@@ -22,7 +22,7 @@ func TestScenarioCommands(t *testing.T) {
 	if err := run([]string{"render", "--scenario", filepath.Join(root, "A01"), "--out", dest}, &out); err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"manifest.json", "bundle.tar.gz", "bootstrap.sh", "collect.sh"} {
+	for _, name := range []string{"manifest.json", "collection-key.pem", "bundle.tar.gz", "bootstrap.sh", "collect.sh"} {
 		if _, err := os.Stat(filepath.Join(dest, name)); err != nil {
 			t.Fatal(err)
 		}

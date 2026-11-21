@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/ds-mrtq/leakbench/internal/canary"
+	"github.com/ds-mrtq/leakbench/internal/sealed"
 )
 
 // Render writes an inspectable bundle tree and bundle.tar.gz. The manifest is
@@ -58,6 +59,13 @@ func Render(s Scenario, m canary.Manifest, outDir string) error {
 	if err != nil {
 		return err
 	}
+	privateKey, publicKey, err := sealed.NewKeyPair()
+	if err != nil {
+		return err
+	}
+	if err = os.WriteFile(filepath.Join(root, "collection-key.pem"), privateKey, 0600); err != nil {
+		return err
+	}
 	replace := func(text string) string {
 		return placeholder.ReplaceAllStringFunc(text, func(token string) string { return values[placeholder.FindStringSubmatch(token)[1]] })
 	}
@@ -86,7 +94,7 @@ func Render(s Scenario, m canary.Manifest, outDir string) error {
 	for _, key := range keys {
 		fmt.Fprintf(&env, "export %s=%s\n", key, shellQuote(replace(s.Env[key])))
 	}
-	for name, content := range map[string]string{"env.sh": env.String(), "bootstrap.sh": bootstrap(s.ID), "collect.sh": collect(s.ID), "session-init.sh": shellLogger} {
+	for name, content := range map[string]string{"env.sh": env.String(), "bootstrap.sh": bootstrap(s.ID), "collect.sh": collect(s.ID, publicKey), "session-init.sh": shellLogger} {
 		mode := fs.FileMode(0600)
 		if strings.HasSuffix(name, ".sh") {
 			mode = 0700
@@ -195,17 +203,28 @@ printf 'Workspace: %s/repo\nFor subsequent commands: . "$HOME/.profile"\n' "$roo
 `
 }
 
-func collect(id string) string {
+func collect(id string, publicKey []byte) string {
+	var encoded strings.Builder
+	for _, b := range publicKey {
+		fmt.Fprintf(&encoded, `\x%02x`, b)
+	}
 	return `#!/usr/bin/env bash
-set -eu
+set +x
+set -euo pipefail
+umask 077
+if ! command -v openssl >/dev/null 2>&1; then
+  printf '%s\n' 'openssl is required to create the session archive' >&2
+  exit 127
+fi
 root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 : "${HOME:?HOME must point to the isolated run home}"
 if [ -n "${EPOCHREALTIME:-}" ]; then
   { (set -C; printf 'SH-COLLECTION-1\t%s\n' "$EPOCHREALTIME" > "$root/shell-logs/collection-start"); } 2>/dev/null || :
 fi
-out="$root/artifacts.tar.gz"
+out="$root/session-archive.bin"
 stage=$(mktemp -d "$root/.collect.XXXXXX")
-trap 'rm -rf "$stage"' EXIT HUP INT TERM
+trap 'rm -rf "$stage"' EXIT
+trap 'exit 1' HUP INT TERM
 mkdir "$stage/home" "$stage/run"
 for path in "$root/shell-logs" "$root/"*.log "$root/typescript"; do
   if [ -e "$path" ]; then cp -R "$path" "$stage/run/"; fi
@@ -213,7 +232,19 @@ done
 for path in "$HOME/.bash_history" "$HOME/.zsh_history" "$HOME/.bash_sessions" "$HOME/shell-logs" "$HOME/"*.log "$HOME/typescript"; do
   if [ -e "$path" ]; then cp -R "$path" "$stage/home/"; fi
 done
-tar -czf "$out" -C "$root" repo -C "$HOME" "remote/` + id + `.git" -C "$stage" home run
+tar -czf "$stage/archive.tar.gz" -C "$root" repo -C "$HOME" "remote/` + id + `.git" -C "$stage" home run
+printf '%b' '` + encoded.String() + `' > "$stage/recipient.der"
+openssl rand -out "$stage/material" 64
+openssl rand -out "$stage/iv" 16
+material=$(od -An -v -tx1 "$stage/material" | tr -d ' \n')
+iv=$(od -An -v -tx1 "$stage/iv" | tr -d ' \n')
+openssl pkeyutl -encrypt -pubin -keyform DER -inkey "$stage/recipient.der" -in "$stage/material" -out "$stage/wrapped" -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 -pkeyopt rsa_mgf1_md:sha256
+openssl enc -aes-256-cbc -K "${material:0:64}" -iv "$iv" -in "$stage/archive.tar.gz" -out "$stage/body"
+{ printf '` + sealed.Magic + `'; cat "$stage/wrapped" "$stage/iv" "$stage/body"; } > "$stage/payload"
+openssl dgst -sha256 -mac HMAC -macopt "hexkey:${material:64:64}" -binary "$stage/payload" > "$stage/tag"
+cat "$stage/payload" "$stage/tag" > "$stage/sealed"
+mv "$stage/sealed" "$out"
+rm -rf "$stage"
 printf '%s\n' "$out"
 `
 }

@@ -4,6 +4,8 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,9 +15,12 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ds-mrtq/leakbench/internal/canary"
 	"github.com/ds-mrtq/leakbench/internal/detect"
+	"github.com/ds-mrtq/leakbench/internal/score"
+	"github.com/ds-mrtq/leakbench/internal/sealed"
 )
 
 func write(t *testing.T, path, text string) {
@@ -88,7 +93,7 @@ func unpack(t *testing.T, bundle, dest string, m canary.Manifest) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if !filepath.IsLocal(h.Name) || h.Name == "manifest.json" {
+		if !filepath.IsLocal(h.Name) || h.Name == "manifest.json" || h.Name == "collection-key.pem" {
 			t.Fatalf("unsafe or runner-only archive entry %s", h.Name)
 		}
 		path := filepath.Join(dest, h.Name)
@@ -105,7 +110,7 @@ func unpack(t *testing.T, bundle, dest string, m canary.Manifest) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if bytes.Contains(b, []byte(m.Control.Value)) || bytes.Contains(b, []byte("{{canary:")) {
+		if bytes.Contains(b, []byte(m.Control.Value)) || bytes.Contains(b, []byte("{{canary:")) || bytes.Contains(b, []byte("-----BEGIN PRIVATE KEY-----")) {
 			t.Fatalf("control or placeholder in %s", h.Name)
 		}
 		write(t, path, string(b))
@@ -113,6 +118,24 @@ func unpack(t *testing.T, bundle, dest string, m canary.Manifest) {
 			t.Fatal(err)
 		}
 	}
+}
+
+func decryptCollection(t *testing.T, root, keyRoot string) []byte {
+	t.Helper()
+	data, err := os.ReadFile(filepath.Join(root, "session-archive.bin"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	key, err := os.ReadFile(filepath.Join(keyRoot, "collection-key.pem"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	plain, err := sealed.Decrypt(key, data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	write(t, filepath.Join(root, "artifacts.tar.gz"), string(plain))
+	return plain
 }
 
 func TestRenderScenarios(t *testing.T) {
@@ -145,6 +168,9 @@ func TestRenderScenarios(t *testing.T) {
 			out := filepath.Join(t.TempDir(), "rendered")
 			if err = Render(s, m, out); err != nil {
 				t.Fatal(err)
+			}
+			if info, err := os.Stat(filepath.Join(out, "collection-key.pem")); err != nil || info.Mode().Perm() != 0600 {
+				t.Fatal("private key permissions", err)
 			}
 			var artifacts []detect.Artifact
 			for _, name := range []string{"repo", "home"} {
@@ -236,14 +262,46 @@ func TestRenderScenarios(t *testing.T) {
 			write(t, filepath.Join(home, ".bash_history"), "git status\n")
 			write(t, filepath.Join(home, "shell-logs", "session.log"), "session output\n")
 			write(t, filepath.Join(extracted, "shell-logs", "tools.log"), "tool output\n")
-			if path := command(t, extracted, home, "bash", "collect.sh"); path != filepath.Join(extracted, "artifacts.tar.gz") {
+			if _, err := exec.LookPath("openssl"); err != nil {
+				t.Skip("openssl unavailable for collection round trip")
+			}
+			boundary := time.Now().UTC()
+			if path := command(t, extracted, home, "bash", "collect.sh"); path != filepath.Join(extracted, "session-archive.bin") {
 				t.Fatalf("unexpected collection path %s", path)
 			}
+			if _, err := os.Stat(filepath.Join(extracted, "artifacts.tar.gz")); !os.IsNotExist(err) {
+				t.Fatal("collector left plaintext archive")
+			}
+			if stages, _ := filepath.Glob(filepath.Join(extracted, ".collect.*")); len(stages) != 0 {
+				t.Fatal("collector left temporary files")
+			}
+			archive := decryptCollection(t, extracted, out)
 			listing := command(t, extracted, home, "tar", "-tzf", "artifacts.tar.gz")
 			for _, entry := range []string{"repo/.git/HEAD", "remote/" + s.ID + ".git/HEAD", "home/.bash_history", "home/shell-logs/session.log", "run/shell-logs/tools.log"} {
 				if !strings.Contains(listing, entry) {
 					t.Errorf("missing collected entry %s", entry)
 				}
+			}
+			scoreRoot := t.TempDir()
+			for _, name := range []string{"manifest.json", "bundle.tar.gz"} {
+				data, err := os.ReadFile(filepath.Join(out, name))
+				if err != nil {
+					t.Fatal(err)
+				}
+				if name == "bundle.tar.gz" {
+					name = "input-bundle.tar.gz"
+				}
+				write(t, filepath.Join(scoreRoot, name), string(data))
+			}
+			write(t, filepath.Join(scoreRoot, "artifacts.tar.gz"), string(archive))
+			body, _ := json.Marshal(map[string]string{"type": "user_message", "timestamp": boundary.Format(time.RFC3339Nano), "message": "Run collect.sh"})
+			write(t, filepath.Join(scoreRoot, "transcript.txt"), fmt.Sprintf("--- event-collect ---\n  direction: incoming\n  type: user_message (message)\n  contents: %s\n", body))
+			write(t, filepath.Join(scoreRoot, "messages.txt"), "")
+			hash := sha256.Sum256(archive)
+			index, _ := json.Marshal([]score.Attachment{{URL: "https://app.devin.ai/attachments/test/artifacts.tar.gz", Path: "artifacts.tar.gz", SHA256: hex.EncodeToString(hash[:])}})
+			write(t, filepath.Join(scoreRoot, "evidence.json"), string(index))
+			if _, err := score.Run(scoreRoot, s.Class); err != nil {
+				t.Fatal(err)
 			}
 		})
 	}

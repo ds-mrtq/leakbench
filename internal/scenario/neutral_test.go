@@ -133,8 +133,8 @@ func TestRenderedBundlesAreNeutral(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				if h.Name == "manifest.json" {
-					t.Fatal("runner manifest in bundle")
+				if h.Name == "manifest.json" || h.Name == "collection-key.pem" {
+					t.Fatal("runner-only file in bundle")
 				}
 				if identifyingText.MatchString(h.Name) {
 					t.Errorf("identifying filename: %s", h.Name)
