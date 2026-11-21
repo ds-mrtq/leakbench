@@ -94,7 +94,7 @@ func Render(s Scenario, m canary.Manifest, outDir string) error {
 	for _, key := range keys {
 		fmt.Fprintf(&env, "export %s=%s\n", key, shellQuote(replace(s.Env[key])))
 	}
-	for name, content := range map[string]string{"env.sh": env.String(), "bootstrap.sh": bootstrap(s.ID), "collect.sh": collect(s.ID, publicKey), "session-init.sh": shellLogger} {
+	for name, content := range map[string]string{"env.sh": env.String(), "bootstrap.sh": bootstrap(), "collect.sh": collect(publicKey), "session-init.sh": shellLogger} {
 		mode := fs.FileMode(0600)
 		if strings.HasSuffix(name, ".sh") {
 			mode = 0700
@@ -124,7 +124,7 @@ func Render(s Scenario, m canary.Manifest, outDir string) error {
 	if err = git(repo, "commit", "--allow-empty", "-m", "Initial project"); err != nil {
 		return err
 	}
-	remote := filepath.Join(root, "remote", s.ID+".git")
+	remote := filepath.Join(root, "remote", "project.git")
 	if err = os.MkdirAll(filepath.Dir(remote), 0700); err != nil {
 		return err
 	}
@@ -134,7 +134,7 @@ func Render(s Scenario, m canary.Manifest, outDir string) error {
 	if err = git(remote, "remote", "remove", "origin"); err != nil {
 		return err
 	}
-	if err = git(repo, "remote", "add", "origin", "~/remote/"+s.ID+".git"); err != nil {
+	if err = git(repo, "remote", "add", "origin", "~/remote/project.git"); err != nil {
 		return err
 	}
 	b, err := json.MarshalIndent(m, "", "  ")
@@ -165,7 +165,7 @@ func git(dir string, args ...string) error {
 
 func shellQuote(s string) string { return "'" + strings.ReplaceAll(s, "'", "'\"'\"'") + "'" }
 
-func bootstrap(id string) string {
+func bootstrap() string {
 	return `#!/usr/bin/env bash
 set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -173,7 +173,7 @@ root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 case "$HOME" in /*) ;; *) echo 'HOME must be absolute' >&2; exit 1 ;; esac
 test "$HOME" != / || exit 1
 mkdir -p "$HOME" "$HOME/remote" "$HOME/shell-logs" "$root/shell-logs"
-remote="$HOME/remote/` + id + `.git"
+remote="$HOME/remote/project.git"
 if [ -e "$remote" ]; then
   echo 'Remote already exists; use a fresh run home' >&2
   exit 1
@@ -186,7 +186,7 @@ for profile in .bashrc .profile .bash_profile .bash_login; do
   cat "$root/env.sh" >> "$HOME/$profile"
   printf '\nif [ -n "${BASH_VERSION-}" ]; then . "$HOME/.session-init"; fi\n' >> "$HOME/$profile"
 done
-cp -R "$root/remote/` + id + `.git" "$remote"
+cp -R "$root/remote/project.git" "$remote"
 cd "$root/repo"
 git init -q -b main
 git config --local user.name 'Local Developer'
@@ -203,7 +203,7 @@ printf 'Workspace: %s/repo\nFor subsequent commands: . "$HOME/.profile"\n' "$roo
 `
 }
 
-func collect(id string, publicKey []byte) string {
+func collect(publicKey []byte) string {
 	var encoded strings.Builder
 	for _, b := range publicKey {
 		fmt.Fprintf(&encoded, `\x%02x`, b)
@@ -232,7 +232,7 @@ done
 for path in "$HOME/.bash_history" "$HOME/.zsh_history" "$HOME/.bash_sessions" "$HOME/shell-logs" "$HOME/"*.log "$HOME/typescript"; do
   if [ -e "$path" ]; then cp -R "$path" "$stage/home/"; fi
 done
-tar -czf "$stage/archive.tar.gz" -C "$root" repo -C "$HOME" "remote/` + id + `.git" -C "$stage" home run
+tar -czf "$stage/archive.tar.gz" -C "$root" repo -C "$HOME" remote/project.git -C "$stage" home run
 printf '%b' '` + encoded.String() + `' > "$stage/recipient.der"
 openssl rand -out "$stage/material" 64
 openssl rand -out "$stage/iv" 16

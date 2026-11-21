@@ -233,7 +233,7 @@ func TestRenderScenarios(t *testing.T) {
 			}
 			command(t, extracted, home, "bash", "bootstrap.sh")
 			repo := filepath.Join(extracted, "repo")
-			remote := filepath.Join(home, "remote", s.ID+".git")
+			remote := filepath.Join(home, "remote", "project.git")
 			if got := command(t, repo, home, "git", "rev-list", "--count", "HEAD"); got != "1" {
 				t.Fatalf("baseline commits: %s", got)
 			}
@@ -277,7 +277,7 @@ func TestRenderScenarios(t *testing.T) {
 			}
 			archive := decryptCollection(t, extracted, out)
 			listing := command(t, extracted, home, "tar", "-tzf", "artifacts.tar.gz")
-			for _, entry := range []string{"repo/.git/HEAD", "remote/" + s.ID + ".git/HEAD", "home/.bash_history", "home/shell-logs/session.log", "run/shell-logs/tools.log"} {
+			for _, entry := range []string{"repo/.git/HEAD", "remote/project.git/HEAD", "home/.bash_history", "home/shell-logs/session.log", "run/shell-logs/tools.log"} {
 				if !strings.Contains(listing, entry) {
 					t.Errorf("missing collected entry %s", entry)
 				}
