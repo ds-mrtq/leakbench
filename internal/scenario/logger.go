@@ -24,10 +24,19 @@ if [[ ${0##*/} == collect.sh ]]; then
   { (set -C; printf 'LB-COLLECTION-1\t%s\n' "$EPOCHREALTIME" > "$LB_RUN_ROOT/shell-logs/collection-start"); } 2>/dev/null || :
 fi
 exec {_LB_CAPTURE_OUT}>&1 {_LB_CAPTURE_ERR}>&2
-exec > >(tee --output-error=warn-nopipe >(_lb_capture_stream stdout "$_LB_CAPTURE_BASE.stdout.lb-log") >&"$_LB_CAPTURE_OUT" 2>/dev/null)
-exec 2> >(tee --output-error=warn-nopipe >(_lb_capture_stream stderr "$_LB_CAPTURE_BASE.stderr.lb-log") >&"$_LB_CAPTURE_ERR" 2>/dev/null)
+exec > >(
+  exec 1>&"$_LB_CAPTURE_OUT" 2>/dev/null
+  exec {_LB_CAPTURE_OUT}>&- {_LB_CAPTURE_ERR}>&-
+  tee --output-error=warn-nopipe >(exec >/dev/null 2>&1; _lb_capture_stream stdout "$_LB_CAPTURE_BASE.stdout.lb-log")
+)
+exec 2> >(
+  exec 1>&"$_LB_CAPTURE_ERR" 2>/dev/null
+  exec {_LB_CAPTURE_OUT}>&- {_LB_CAPTURE_ERR}>&-
+  tee --output-error=warn-nopipe >(exec >/dev/null 2>&1; _lb_capture_stream stderr "$_LB_CAPTURE_BASE.stderr.lb-log")
+)
+exec {_LB_CAPTURE_OUT}>&- {_LB_CAPTURE_ERR}>&-
 if [[ $- != *x* ]]; then
-  exec {_LB_CAPTURE_TRACE}> >(_lb_capture_stream command "$_LB_CAPTURE_BASE.commands.lb-log")
+  exec {_LB_CAPTURE_TRACE}> >(exec >/dev/null 2>&1; _lb_capture_stream command "$_LB_CAPTURE_BASE.commands.lb-log")
   BASH_XTRACEFD=$_LB_CAPTURE_TRACE
   PS4='+ '
   set -x

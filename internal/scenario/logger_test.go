@@ -2,6 +2,7 @@ package scenario
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -171,5 +173,63 @@ func TestShellCapturePreservesDEBUGTrap(t *testing.T) {
 	b, err := os.ReadFile(filepath.Join(root, "debug-events"))
 	if err != nil || len(b) == 0 {
 		t.Fatal("existing DEBUG trap stopped running")
+	}
+}
+
+func TestShellCaptureBackgroundDoesNotHoldCallerPipes(t *testing.T) {
+	root, home, _ := loggerRun(t)
+	t.Cleanup(func() {
+		b, err := os.ReadFile(filepath.Join(root, "background.pid"))
+		if err != nil {
+			return
+		}
+		pid, err := strconv.Atoi(strings.TrimSpace(string(b)))
+		if err != nil {
+			return
+		}
+		if process, err := os.FindProcess(pid); err == nil {
+			_ = process.Kill()
+		}
+	})
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "bash", "--noprofile", "--norc", "-c", `timeout 10 bash -lc 'sleep 30 >/dev/null 2>&1 & echo $! > "$LB_RUN_ROOT/background.pid"; echo ok' | cat`)
+	cmd.Dir = root
+	cmd.Env = isolatedEnv(home)
+	cmd.WaitDelay = 500 * time.Millisecond
+	started := time.Now()
+	out, err := cmd.CombinedOutput()
+	if err != nil || string(out) != "ok\n" {
+		t.Fatalf("background process held caller pipes: %q %v", out, err)
+	}
+	if time.Since(started) > 3*time.Second {
+		t.Fatal("shell completion waited on background capture descriptors")
+	}
+	deadline := time.Now().Add(time.Second)
+	for {
+		found := false
+		err := filepath.WalkDir(filepath.Join(root, "shell-logs"), func(p string, d os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if !d.IsDir() && strings.HasSuffix(p, ".commands.lb-log") {
+				b, err := os.ReadFile(p)
+				if err != nil {
+					return err
+				}
+				found = found || bytes.Contains(b, []byte("echo ok"))
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if found {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("echo ok was not logged")
+		}
+		time.Sleep(10 * time.Millisecond)
 	}
 }
