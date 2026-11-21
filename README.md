@@ -30,6 +30,43 @@ shell history, `.bash_sessions`, `typescript`, top-level `*.log` files and
 `shell-logs/` in both the run directory and HOME. Put adapter shell logs in those
 directories. Collection does not include the runner manifest.
 
+### Workspace Bash capture
+
+New bundles include `shell-logger.sh`. Bootstrap installs quiet startup hooks
+in the isolated HOME's `.profile` and `.bashrc` (and existing Bash login
+profiles). Bash 5+ login/interactive shells load the logger; sourcing
+`~/.profile` also exports `BASH_ENV`, so descendant plain `bash -c` shells
+load it. A fresh tool process that neither sources a startup file nor inherits
+`BASH_ENV` is not captured. Bash 5+ and GNU `tee` are needed for capture; when
+unavailable, the hook quietly leaves the shell uninstrumented.
+
+Private-FD Bash tracing records expanded command text without evaluating it
+again; stdout and stderr are forwarded through independent `tee` observers. Timestamped text
+records live in workspace `shell-logs/*.lb-log`, separate from session-export
+limits. Log writes fail open and do not print diagnostics or replace command
+exit statuses. DEBUG traps are left alone, existing xtrace is not replaced
+(private command capture is then unavailable), and an already instrumented
+shell is not wrapped again.
+
+`collect.sh` archives these logs under `run/shell-logs/` and writes a first-use
+collection timestamp. `lb score` scans parsed log payloads as **exposed only**,
+channel `shell-log`, using the earlier of that marker and the incoming
+`collect.sh` request. Equal/later timestamps are collection-phase, including
+the collector's own shell; missing boundaries or invalid records are handled
+conservatively with warnings. Collection records do not raise task scores.
+
+This is not lossless or tamper-proof tracing: it cannot see in-memory tool
+reads that bypass Bash, direct file-descriptor redirections away from shell
+stdout/stderr, disabled hooks, unsourced shells, or writes never printed.
+Disabling xtrace stops command capture; instrumentation changes shell tracing
+flags/PS4 and adds file descriptors. Output records
+are line-oriented text (NUL bytes are not retained); incomplete lines are
+timestamped when received, potentially after the task boundary. Nested shells
+can duplicate output. Forwarding preserves output bytes, but changes TTY/pipe
+identity, buffering/timing and potentially SIGPIPE behavior; do not use these
+logs to claim complete provider exposure or perfectly transparent execution.
+Existing pilot bundles/results do not gain capture retroactively.
+
 Each `scenario.json` declares `id`, `class` (the full A–E heading from the
 design), `title`, nonempty `sources`, `canaries` (`name` and package `kind`),
 the neutral `prompt`, an `env` map and `time_limit_minutes` (1–240). Templates

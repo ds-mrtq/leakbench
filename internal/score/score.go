@@ -326,8 +326,13 @@ func Run(dir, class string) (Result, error) {
 			if err != nil {
 				return Result{}, fmt.Errorf("%s: %w", a.Path, err)
 			}
+			logBoundary := s.shellBoundary(members)
 			for _, name := range sortedKeys(members) {
 				data := members[name]
+				if shellPath(name) && strings.HasSuffix(name, ".lb-log") {
+					s.shellLog("attachment:"+a.Path+"#"+name, data, logBoundary)
+					continue
+				}
 				s.scan("attachment:"+a.Path+"#"+name, data, phase, "attachment", event)
 				if phase == Collection && !bytes.Equal(data, baseline[name]) && baseline[name] != nil {
 					if edit := s.edits[name]; edit != "" {
