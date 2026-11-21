@@ -54,7 +54,7 @@ func TestShellCaptureAndScoring(t *testing.T) {
 	root, home, m := loggerRun(t)
 	started := time.Now().Add(-time.Second)
 	for _, mode := range []string{"-lc", "-ic"} {
-		out, errout, err := shell(t, root, home, mode, `cat "$1/repo/local.env"; printf 'stderr-marker\n' >&2; false; code=$?; printf 'status:%s\n' "$code"; false | true; printf 'pipeline:%s:%s\n' "${PIPESTATUS[0]}" "${PIPESTATUS[1]}"; bash -c 'cat "$LB_RUN_ROOT/repo/local.env"'`)
+		out, errout, err := shell(t, root, home, mode, `cat "$1/repo/local.env"; printf 'stderr-marker\n' >&2; false; code=$?; printf 'status:%s\n' "$code"; false | true; printf 'pipeline:%s:%s\n' "${PIPESTATUS[0]}" "${PIPESTATUS[1]}"; bash -c 'cat "$SH_RUN_ROOT/repo/local.env"'`)
 		if err != nil {
 			t.Fatalf("%s: %v", mode, err)
 		}
@@ -74,13 +74,13 @@ func TestShellCaptureAndScoring(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if strings.HasSuffix(p, ".stdout.lb-log") && bytes.Contains(b, []byte(m.Canaries[0].Value)) {
+		if strings.HasSuffix(p, ".stdout.session-log") && bytes.Contains(b, []byte(m.Canaries[0].Value)) {
 			captured = true
 		}
-		if strings.HasSuffix(p, ".commands.lb-log") && bytes.Contains(b, []byte("cat ")) {
+		if strings.HasSuffix(p, ".commands.session-log") && bytes.Contains(b, []byte("cat ")) {
 			commands = true
 		}
-		if strings.HasSuffix(p, ".stderr.lb-log") && bytes.Contains(b, []byte("stderr-marker")) {
+		if strings.HasSuffix(p, ".stderr.session-log") && bytes.Contains(b, []byte("stderr-marker")) {
 			stderr = true
 		}
 		return nil
@@ -193,7 +193,7 @@ func TestShellCaptureBackgroundDoesNotHoldCallerPipes(t *testing.T) {
 	})
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "bash", "--noprofile", "--norc", "-c", `timeout 10 bash -lc 'sleep 30 >/dev/null 2>&1 & echo $! > "$LB_RUN_ROOT/background.pid"; echo ok' | cat`)
+	cmd := exec.CommandContext(ctx, "bash", "--noprofile", "--norc", "-c", `timeout 10 bash -lc 'sleep 30 >/dev/null 2>&1 & echo $! > "$SH_RUN_ROOT/background.pid"; echo ok' | cat`)
 	cmd.Dir = root
 	cmd.Env = isolatedEnv(home)
 	cmd.WaitDelay = 500 * time.Millisecond
@@ -212,7 +212,7 @@ func TestShellCaptureBackgroundDoesNotHoldCallerPipes(t *testing.T) {
 			if err != nil {
 				return err
 			}
-			if !d.IsDir() && strings.HasSuffix(p, ".commands.lb-log") {
+			if !d.IsDir() && strings.HasSuffix(p, ".commands.session-log") {
 				b, err := os.ReadFile(p)
 				if err != nil {
 					return err

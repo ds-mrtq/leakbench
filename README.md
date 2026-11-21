@@ -81,7 +81,7 @@ shells that skip startup files and do not inherit `BASH_ENV`. Their contents
 count only if independently available in other scored evidence; absence from
 shell logs does not mean the agent never saw a value.
 
-New bundles include `shell-logger.sh`. Bootstrap installs quiet startup hooks
+New bundles include `session-init.sh`. Bootstrap installs quiet startup hooks
 in the isolated HOME's `.profile` and `.bashrc` (and existing Bash login
 profiles). Bash 5+ login/interactive shells load the logger; sourcing
 `~/.profile` also exports `BASH_ENV`, so descendant plain `bash -c` shells
@@ -91,7 +91,7 @@ unavailable, the hook quietly leaves the shell uninstrumented.
 
 Private-FD Bash tracing records expanded command text without evaluating it
 again; stdout and stderr are forwarded through independent `tee` observers. Timestamped text
-records live in workspace `shell-logs/*.lb-log`, separate from session-export
+records live in workspace `shell-logs/*.session-log`, separate from session-export
 limits. Log writes fail open and do not print diagnostics or replace command
 exit statuses. DEBUG traps are left alone, existing xtrace is not replaced
 (private command capture is then unavailable), and an already instrumented
@@ -111,6 +111,13 @@ channel `shell-log`, using the earlier of that marker and the incoming
 `collect.sh` request. Equal/later timestamps are collection-phase, including
 the collector's own shell; missing boundaries or invalid records are handled
 conservatively with warnings. Collection records do not raise task scores.
+
+Agent-visible capture files use neutral names (`.session-init`,
+`session-init.sh`, `SH_RUN_ROOT`, `_SH_TRACE_*`, `SH-SESSION-1` and
+`SH-COLLECTION-1`). The scorer also accepts legacy `.lb-log` files and
+`LB-SHELL-1`/`LB-COLLECTION-1` records so archived pilots remain reproducible.
+All 46 rendered bundles are checked for identifying names/text, including
+their Git contents; the runner-only manifest is not sent to the agent.
 
 This is not lossless or tamper-proof tracing: it cannot see in-memory tool
 reads that bypass Bash, direct file-descriptor redirections away from shell

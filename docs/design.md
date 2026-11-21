@@ -27,6 +27,14 @@ Isolation: for Devin, each run is its own child VM (the agent's own sandbox); no
 
 ### Workspace shell evidence
 
+Agent-visible bundle instrumentation uses neutral names: `session-init.sh`,
+`.session-init`, `SH_RUN_ROOT`, `_SH_TRACE_*`, and `.session-log` files with
+`SH-SESSION-1`/`SH-COLLECTION-1` records. The scorer retains legacy filename
+and record support for archived evidence. All 46 bundles are checked for
+identifying filenames and text, including inflated Git objects; manifests
+remain runner-only. This removes bundle naming cues, not cues introduced by
+the platform, Bot name/memory paths, ticket wrappers, or the task itself.
+
 New scenario bundles install a Bash 5+/GNU `tee` logger through isolated-HOME
 login/interactive startup files. Sourcing `.profile` exports `BASH_ENV` for
 descendant noninteractive Bash shells. The logger records command text with a

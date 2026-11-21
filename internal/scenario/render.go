@@ -86,7 +86,7 @@ func Render(s Scenario, m canary.Manifest, outDir string) error {
 	for _, key := range keys {
 		fmt.Fprintf(&env, "export %s=%s\n", key, shellQuote(replace(s.Env[key])))
 	}
-	for name, content := range map[string]string{"env.sh": env.String(), "bootstrap.sh": bootstrap(s.ID), "collect.sh": collect(s.ID), "shell-logger.sh": shellLogger} {
+	for name, content := range map[string]string{"env.sh": env.String(), "bootstrap.sh": bootstrap(s.ID), "collect.sh": collect(s.ID), "session-init.sh": shellLogger} {
 		mode := fs.FileMode(0600)
 		if strings.HasSuffix(name, ".sh") {
 			mode = 0700
@@ -171,12 +171,12 @@ if [ -e "$remote" ]; then
   exit 1
 fi
 cp -R "$root/home/." "$HOME/"
-printf 'export LB_RUN_ROOT=%q\nexport BASH_ENV=%q\n. "$BASH_ENV"\n' "$root" "$root/shell-logger.sh" > "$HOME/.leakbench-shell-init"
+printf 'export SH_RUN_ROOT=%q\nexport BASH_ENV=%q\n. "$BASH_ENV"\n' "$root" "$root/session-init.sh" > "$HOME/.session-init"
 for profile in .bashrc .profile .bash_profile .bash_login; do
   case "$profile" in .bash_profile|.bash_login) [ -f "$HOME/$profile" ] || continue ;; esac
   printf '\n' >> "$HOME/$profile"
   cat "$root/env.sh" >> "$HOME/$profile"
-  printf '\nif [ -n "${BASH_VERSION-}" ]; then . "$HOME/.leakbench-shell-init"; fi\n' >> "$HOME/$profile"
+  printf '\nif [ -n "${BASH_VERSION-}" ]; then . "$HOME/.session-init"; fi\n' >> "$HOME/$profile"
 done
 cp -R "$root/remote/` + id + `.git" "$remote"
 cd "$root/repo"
@@ -201,7 +201,7 @@ set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 : "${HOME:?HOME must point to the isolated run home}"
 if [ -n "${EPOCHREALTIME:-}" ]; then
-  { (set -C; printf 'LB-COLLECTION-1\t%s\n' "$EPOCHREALTIME" > "$root/shell-logs/collection-start"); } 2>/dev/null || :
+  { (set -C; printf 'SH-COLLECTION-1\t%s\n' "$EPOCHREALTIME" > "$root/shell-logs/collection-start"); } 2>/dev/null || :
 fi
 out="$root/artifacts.tar.gz"
 stage=$(mktemp -d "$root/.collect.XXXXXX")
@@ -232,7 +232,7 @@ func pack(root string) (err error) {
 			}
 		}
 	}()
-	for _, name := range []string{"repo", "home", "remote", "env.sh", "bootstrap.sh", "collect.sh", "shell-logger.sh"} {
+	for _, name := range []string{"repo", "home", "remote", "env.sh", "bootstrap.sh", "collect.sh", "session-init.sh"} {
 		err = filepath.WalkDir(filepath.Join(root, name), func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
