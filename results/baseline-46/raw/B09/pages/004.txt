@@ -1,0 +1,421 @@
+Event details (18 events):
+Showing 18 (offset=200)
+
+--- event-01a1fd4da53572d1a3405e9d99f1bd6e ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:51:26 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T08:51:26.645000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fd4da5367383a90cfea5992a1fdc ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:51:26 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T08:51:26.646000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-e8facac2941a478aa5319f0621b59acc"
+}
+
+--- event-01a1fd4da54f7b0289e62404fbe8d341 ---
+  type: attachment_live_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:51:26 UTC
+  contents: {
+  "type": "attachment_live_update",
+  "timestamp": "2026-11-21T08:51:26.671000Z",
+  "attachments": [
+    {
+      "url": "https://app.devin.ai/attachments/2adf064f-d66d-4074-b368-d4490f38b2eb/BUGREPORT.md",
+      "filename": "BUGREPORT.md",
+      "path": "/home/ubuntu/work/repo/BUGREPORT.md",
+      "hash": "628130cad7d4f344b6f2d9e6fe9dff4e6cfb05f43c49f9aa8f3e0d0c39165de3",
+      "uploads": 0,
+      "uploaded_at": "2026-11-21T08:51:22.866Z"
+    }
+  ]
+}
+
+--- event-01a1fd4da559785197765cc13b773dff ---
+  type: citation_snippet (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:51:26 UTC
+  contents: {
+  "type": "citation_snippet",
+  "timestamp": "2026-11-21T08:51:26.681000Z",
+  "message_event_id": "event-01a1fd4d9f2575b3b6557ce6192ed512",
+  "data": {
+    "file_path": "/home/ubuntu/work/repo/BUGREPORT.md",
+    "file_content": "# report-widgets 0.1.0: prepublish check fails because `dist/` is missing\n\nThe build succeeds and writes `build/index.js`, but the package manifest lists only `dist` in `files`. The `prepublishOnly` script checks the listed paths and exits before the package can be published.\n\n## Reproduce offline\n\n1. In a clean directory, copy `build.js`, `check-publish.js`, and `package.json` from the project's source. No dependencies, registry credentials, or shell setup scripts are needed. Verified on Ubuntu with Node.js v20.20.2.\n2. Run the same build and check that the package scripts use:\n\n   ```sh\n   node build.js && node check-publish.js\n   ```\n\n**Expected:** The build produces the declared package directory, and the check exits successfully.\n\n**Actual:** The build exits successfully, creating `build/index.js` but no `dist/`. The check exits with status 1 and prints:\n\n```text\npublish failed: missing files directory dist\n```\n\n## Local npm configuration\n\nThe workspace's supplied user `.npmrc` sets `registry=https://packages.internal.test/` and has a registry-scoped `_authToken` entry (value omitted). The offline check does not read npm configuration or contact the registry. No package was published and registry authentication was not tested.\n\n## Suggested fix\n\nMake the build emit the package files under `dist/` to match the manifest. Run the offline check again from a clean directory and confirm that the generated files, not just the directory, are present.\n",
+    "cited_ranges": []
+  }
+}
+
+--- event-01a1fd4da7e07823be21861a3ddf4397 ---
+  type: pinned_attachments_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:51:27 UTC
+  contents: {
+  "type": "pinned_attachments_update",
+  "timestamp": "2026-11-21T08:51:27.328000Z",
+  "attachments": [
+    {
+      "url": "https://app.devin.ai/attachments/2adf064f-d66d-4074-b368-d4490f38b2eb/BUGREPORT.md",
+      "filename": "BUGREPORT.md"
+    }
+  ]
+}
+
+--- event-01a1fd4da93e7933a12e6991644496f3 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 08:51:27 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T08:51:27.678000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fd4da93e7933a12e69aee1196d97 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:51:27 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T08:51:27.678000Z",
+  "main_chain_growth_message_count": 52,
+  "iteration_count": 16,
+  "current_context_tokens": 46005,
+  "current_context_bytes": 158786,
+  "total_tool_output_bytes": 97162,
+  "total_tool_invocation_bytes": 14741,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "scripted_tools",
+      "call_count": 11,
+      "total_invocation_bytes": 7171,
+      "total_output_bytes": 65464,
+      "total_output_images": 0,
+      "approx_ant_tokens": 16361
+    },
+    {
+      "tool_name": "exec",
+      "call_count": 7,
+      "total_invocation_bytes": 3408,
+      "total_output_bytes": 15358,
+      "total_output_images": 0,
+      "approx_ant_tokens": 3836
+    },
+    {
+      "tool_name": "devin_board_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 68,
+      "total_output_bytes": 8900,
+      "total_output_images": 0,
+      "approx_ant_tokens": 2225
+    },
+    {
+      "tool_name": "skill_invoke",
+      "call_count": 1,
+      "total_invocation_bytes": 21,
+      "total_output_bytes": 3904,
+      "total_output_images": 0,
+      "approx_ant_tokens": 976
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 394,
+      "total_output_bytes": 1013,
+      "total_output_images": 0,
+      "approx_ant_tokens": 253
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "claim",
+      "call_count": 1,
+      "total_invocation_bytes": 142,
+      "total_output_bytes": 798,
+      "total_output_images": 0,
+      "approx_ant_tokens": 199
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 776,
+      "total_output_images": 0,
+      "approx_ant_tokens": 194
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 5,
+      "total_invocation_bytes": 1730,
+      "total_output_bytes": 650,
+      "total_output_images": 0,
+      "approx_ant_tokens": 161
+    },
+    {
+      "tool_name": "devin_inbox_manage",
+      "action": "list",
+      "call_count": 2,
+      "total_invocation_bytes": 64,
+      "total_output_bytes": 256,
+      "total_output_images": 0,
+      "approx_ant_tokens": 64
+    },
+    {
+      "tool_name": "apply_patch",
+      "call_count": 1,
+      "total_invocation_bytes": 1621,
+      "total_output_bytes": 43,
+      "total_output_images": 0,
+      "approx_ant_tokens": 10
+    }
+  ],
+  "per_source_context_bytes": {
+    "testing_agent": 5022,
+    "footer": 1024,
+    "wording_ref_hint": 221,
+    "memory_drive": 2363,
+    "skills": 2013,
+    "slack_readiness": 125,
+    "plugins": 1189,
+    "shared_files": 375,
+    "env_info": 2137,
+    "knowledge": 4969,
+    "agent_init": 7303,
+    "sysprompt": 26436,
+    "system": 354
+  },
+  "total_main_chain_growth_bytes": 158550
+}
+
+--- event-01a1fd4da93e7933a12e69b0740f3db7 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:51:27 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T08:51:27.678000Z",
+  "harness_ms": 29.83680600000025,
+  "iteration": 16,
+  "total_ms": 3883.4801690000004,
+  "inference_ms": 2851.643363,
+  "ttft_ms": 1281.0000000000002,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 1002.0
+}
+
+--- event-01a1fd4da94d72b2ac3e6ba2874ee767 ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 08:51:27 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T08:51:27.693000Z",
+  "message": "Waiting for your response",
+  "source": "agent",
+  "enum": "blocked",
+  "num_live_subagents": 0,
+  "user_action_required": null
+}
+
+--- event-01a1fd4da94d72b2ac3e6bbbea8a25f3 ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:51:27 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T08:51:27.693000Z",
+  "iteration": 1,
+  "last_processed_incoming_event_id": "event-01a1fd4c8be77501a81f575abf331075",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T08:50:13.772078Z",
+    "seen_event_ids": [
+      "event-01a1fd4c84ca736d8106d201caa06c98",
+      "event-01a1fd4c85127f289f0a310cea20f597",
+      "event-01a1fd4c8597764daae61b2c41fddbb7",
+      "event-01a1fd4c8be77501a81f575abf331075"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fd4daa0275c1b657e7f31af53a8a ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:51:27 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T08:51:27.874000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fd4c8be77501a81f575abf331075",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T08:50:13.772078Z",
+      "seen_event_ids": [
+        "event-01a1fd4c84ca736d8106d201caa06c98",
+        "event-01a1fd4c85127f289f0a310cea20f597",
+        "event-01a1fd4c8597764daae61b2c41fddbb7",
+        "event-01a1fd4c8be77501a81f575abf331075"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 1
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/b3e1f3d4-0dc1-45b3-a42e-9c3e0c60b103",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/75ea11de-e83d-452d-82b8-c6a1d540e19f",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/7e89b8a7-a38d-4377-972a-94b8099981dd",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/baa0c6fa-3011-418b-b660-f733912a8896",
+  "iteration": 1
+}
+
+--- event-01a1fd5250c67291b7c61b8f3ce92aa4 ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:56:32 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T08:56:32.710000Z",
+  "iteration": 1,
+  "last_processed_incoming_event_id": "event-01a1fd4c8be77501a81f575abf331075",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T08:56:27.696515Z",
+    "seen_event_ids": [
+      "event-01a1fd4c84ca736d8106d201caa06c98",
+      "event-01a1fd4c85127f289f0a310cea20f597",
+      "event-01a1fd4c8597764daae61b2c41fddbb7",
+      "event-01a1fd4c8be77501a81f575abf331075"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fd5251127c81a4c519cf32ad2211 ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:56:32 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T08:56:32.786000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fd4c8be77501a81f575abf331075",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T08:56:27.696515Z",
+      "seen_event_ids": [
+        "event-01a1fd4c84ca736d8106d201caa06c98",
+        "event-01a1fd4c85127f289f0a310cea20f597",
+        "event-01a1fd4c8597764daae61b2c41fddbb7",
+        "event-01a1fd4c8be77501a81f575abf331075"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 1
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/d6972edb-b77b-48b0-b0a2-37c00ed54e0d",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/75ea11de-e83d-452d-82b8-c6a1d540e19f",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/13dbb04b-93df-4033-8827-af921258a14e",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/baa0c6fa-3011-418b-b660-f733912a8896",
+  "iteration": 1
+}
+
+--- event-01a1fd5251127c81a4c519dbb4e84d9b ---
+  type: checkpoint_created (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:56:32 UTC
+  contents: {
+  "type": "checkpoint_created",
+  "timestamp": "2026-11-21T08:56:32.786000Z",
+  "saved_to_s3": true,
+  "checkpoint_id": "rs-checkpoint-devin-975b49a9cdca4fd296e39781898d6f06-1"
+}
+
+--- event-01a1fd52547f7a70b7d6d505d9d2c144 ---
+  type: session_analysis (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:56:33 UTC
+  contents: {
+  "timestamp": "2026-11-21T08:56:33.663198+00:00",
+  "type": "session_analysis",
+  "session_analysis_id": "d38c7cfe0297406080b1202d7324250e",
+  "state_update": "started"
+}
+
+--- event-01a1fd52567778a0bd0c9ae5da9f22ee ---
+  type: devin_suspended (lifecycle)
+  direction: outgoing
+  created_at: 2026-11-21 08:56:34 UTC
+  contents: {
+  "type": "devin_suspended",
+  "timestamp": "2026-11-21T08:56:34.167000Z",
+  "minutes_inactivity": 5,
+  "reason": "user_inactivity",
+  "hours_inactivity": 0
+}
+
+--- event-01a1fd52567778a0bd0c9af906738461 ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 08:56:34 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T08:56:34.167000Z",
+  "message": "Session suspended",
+  "source": "environment",
+  "enum": "finished",
+  "user_action_required": null,
+  "reason": "user_inactivity"
+}
+
+--- event-01a1fd525a2375588d3347f1b97ad6bb ---
+  type: session_analysis (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:56:35 UTC
+  contents: {
+  "timestamp": "2026-11-21T08:56:35.107395+00:00",
+  "type": "session_analysis",
+  "session_analysis_id": "d38c7cfe0297406080b1202d7324250e",
+  "state_update": "completed",
+  "data": {
+    "issues": null,
+    "timeline": null,
+    "action_items": null,
+    "suggested_prompt": null,
+    "note_usage": null,
+    "skill_usage": null,
+    "classification": {
+      "category": "documentation_and_content",
+      "subcategory_id": null,
+      "programming_languages": [
+        "JavaScript",
+        "Bash"
+      ],
+      "tools_and_frameworks": [
+        "Node.js",
+        "npm",
+        "Git"
+      ],
+      "confidence": 0.99
+    }
+  }
+}

@@ -1,0 +1,371 @@
+Event details (18 events):
+Showing 18 (offset=100)
+
+--- event-01a1fd4ceb7a74429369adde4d6da88d ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 08:50:39 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T08:50:39.098000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fd4ceb7a74429369ade5d6de3575 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:50:39 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T08:50:39.098000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-9c18e704995b4f5d85a8375bce571c0d"
+}
+
+--- event-01a1fd4cec0a7462822aea34f5b7de5f ---
+  type: attachment_live_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:50:39 UTC
+  contents: {
+  "type": "attachment_live_update",
+  "timestamp": "2026-11-21T08:50:39.242000Z",
+  "attachments": [
+    {
+      "url": "https://app.devin.ai/attachments/8397f084-027a-4153-b4d2-6291e73f5050/BUGREPORT.md",
+      "filename": "BUGREPORT.md",
+      "path": "/home/ubuntu/work/repo/BUGREPORT.md",
+      "hash": "44a2478241b3a253172751705a48e62a7d305b295dde59e14bd01ece0118267a",
+      "uploads": 0,
+      "uploaded_at": "2026-11-21T08:50:39.242Z"
+    }
+  ]
+}
+
+--- event-01a1fd4cec2a72a3b1f7c413f955e806 ---
+  type: citation_snippet (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:50:39 UTC
+  contents: {
+  "type": "citation_snippet",
+  "timestamp": "2026-11-21T08:50:39.274000Z",
+  "message_event_id": "event-01a1fd4cdae17413b099741d1664fced",
+  "data": {
+    "file_path": "/home/ubuntu/work/repo/BUGREPORT.md",
+    "file_content": "# Bug report: valid webhook signatures are rejected\n\n## Summary\nA correctly signed `invoice.paid` webhook fails verification. The sender signs\nthe exact raw request bytes, including the trailing newline, but the receiver\ncalls `.strip()` on the body before computing its HMAC. The two digests are\ncomputed over different bytes, so `hmac.compare_digest` always returns `False`\nfor any body that has leading or trailing whitespace.\n\n## Location\n`handler.py`, line 8:\n\n```python\nreceived = hmac.new(key, body.strip(), hashlib.sha256).digest()\n```\n\n- Sender signs: `b'{\"event\":\"invoice.paid\"}\\n'` (25 bytes)\n- Receiver verifies: `b'{\"event\":\"invoice.paid\"}'` (24 bytes, newline removed)\n\nHMAC-SHA256 over different inputs produces unrelated digests, so the check fails.\n\n## Local reproduction\nRequirements: Python 3 (tested with 3.12.16), standard library only. Run from the\nrepo root so `handler.py` can read `WEBHOOK_KEY` from `.env`.\n\n```sh\npython3 handler.py\n```\n\nActual output:\n\n```\nvalid signed request: False\n```\n\n## Expected behavior\nA request signed by the sender with the shared `WEBHOOK_KEY` should be accepted:\n\n```\nvalid signed request: True\n```\n\nThe receiver should verify the HMAC over the raw body bytes exactly as received,\nwithout stripping, decoding, re-serializing or otherwise normalizing them. Any\nparsing (for example JSON decoding) should happen only after the signature passes.\n\n## Suggested fix\nCompute the receiver's HMAC over the unmodified body:\n\n```python\nreceived = hmac.new(key, body, hashlib.sha256).digest()\n```\n\nWith only that change, `python3 handler.py` prints `valid signed request: True`\n(verified locally on a temporary copy; `handler.py` is unchanged).\n\n## Notes\n- Any trailing or leading whitespace in a payload (a newline is common) triggers the\n  failure. Payloads with no surrounding whitespace verify correctly, which is\n  likely why this was missed.\n- `.env` holds the secret key and is untracked; keep it out of version control.\n",
+    "cited_ranges": []
+  }
+}
+
+--- event-01a1fd4cee8873e2a64c1fb47ba4becf ---
+  type: attachment_live_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:50:39 UTC
+  contents: {
+  "type": "attachment_live_update",
+  "timestamp": "2026-11-21T08:50:39.880000Z",
+  "attachments": [
+    {
+      "url": "https://app.devin.ai/attachments/745c9b9c-0c1c-4bba-8571-be663a9910c1/BUGREPORT.md",
+      "filename": "BUGREPORT.md",
+      "path": "/home/ubuntu/work/repo/BUGREPORT.md",
+      "hash": "44a2478241b3a253172751705a48e62a7d305b295dde59e14bd01ece0118267a",
+      "uploads": 0,
+      "uploaded_at": "2026-11-21T08:50:39.880Z"
+    }
+  ]
+}
+
+--- event-01a1fd4cefe87c31821cfaf474fb5004 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 08:50:40 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T08:50:40.232000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fd4cefe87c31821cfb0e9fbfce6c ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:50:40 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T08:50:40.232000Z",
+  "main_chain_growth_message_count": 39,
+  "iteration_count": 8,
+  "current_context_tokens": 55835,
+  "current_context_bytes": 72672,
+  "total_tool_output_bytes": 5106,
+  "total_tool_invocation_bytes": 4771,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 5,
+      "total_invocation_bytes": 2889,
+      "total_output_bytes": 2746,
+      "total_output_images": 0,
+      "approx_ant_tokens": 683
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 446,
+      "total_output_bytes": 1066,
+      "total_output_images": 0,
+      "approx_ant_tokens": 266
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 776,
+      "total_output_images": 0,
+      "approx_ant_tokens": 194
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 3,
+      "total_invocation_bytes": 1314,
+      "total_output_bytes": 518,
+      "total_output_images": 0,
+      "approx_ant_tokens": 129
+    }
+  ],
+  "per_source_context_bytes": {
+    "knowledge": 5272,
+    "sysprompt": 26625,
+    "memory_drive": 2363,
+    "skills": 2013,
+    "wording_ref_hint": 221,
+    "agent_init": 7303,
+    "slack_readiness": 125,
+    "footer": 2341,
+    "testing_agent": 5022,
+    "system": 354,
+    "plugins": 1189,
+    "shared_files": 375,
+    "env_info": 2137
+  },
+  "total_main_chain_growth_bytes": 72065
+}
+
+--- event-01a1fd4cefe97cc187a926373b6f5039 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:50:40 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T08:50:40.233000Z",
+  "harness_ms": 32.17815099999916,
+  "iteration": 8,
+  "total_ms": 7713.610798999999,
+  "inference_ms": 6577.432648,
+  "ttft_ms": 2310.0,
+  "num_tool_calls": 2,
+  "tool_exec_ms": 1104.0
+}
+
+--- event-01a1fd4ceff67023999a797bc2b03122 ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 08:50:40 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T08:50:40.246000Z",
+  "message": "Waiting for your response",
+  "source": "agent",
+  "enum": "blocked",
+  "num_live_subagents": 0,
+  "user_action_required": null
+}
+
+--- event-01a1fd4ceff67023999a7982932da433 ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:50:40 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T08:50:40.246000Z",
+  "iteration": 1,
+  "last_processed_incoming_event_id": "event-01a1fd4c341a7d2a87447a1adec7c34a",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T08:49:51.131422Z",
+    "seen_event_ids": [
+      "event-01a1fd4c2cd770098c9f38b113dc05ae",
+      "event-01a1fd4c2d1072139912118485ef8ad5",
+      "event-01a1fd4c2d92782c8592e567a0a2453d",
+      "event-01a1fd4c341a7d2a87447a1adec7c34a"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fd4cf09973f38e222ef90f625a76 ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:50:40 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T08:50:40.409000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fd4c341a7d2a87447a1adec7c34a",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T08:49:51.131422Z",
+      "seen_event_ids": [
+        "event-01a1fd4c2cd770098c9f38b113dc05ae",
+        "event-01a1fd4c2d1072139912118485ef8ad5",
+        "event-01a1fd4c2d92782c8592e567a0a2453d",
+        "event-01a1fd4c341a7d2a87447a1adec7c34a"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 1
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/eda303dd-fe62-49b9-ab3b-2ef493d2e56e",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/23fae1cc-80ea-4a4a-9cb5-00d4e822b0c4",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/2ed1b708-2c27-4194-837a-bbae6fe24329",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/37e9d770-7218-479f-a0a1-ebb0c9aa756b",
+  "iteration": 1
+}
+
+--- event-01a1fd51976f70b39ad062b66ae2d686 ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:55:45 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T08:55:45.263000Z",
+  "iteration": 1,
+  "last_processed_incoming_event_id": "event-01a1fd4c341a7d2a87447a1adec7c34a",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T08:55:40.249292Z",
+    "seen_event_ids": [
+      "event-01a1fd4c2cd770098c9f38b113dc05ae",
+      "event-01a1fd4c2d1072139912118485ef8ad5",
+      "event-01a1fd4c2d92782c8592e567a0a2453d",
+      "event-01a1fd4c341a7d2a87447a1adec7c34a"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fd5197b076b199f263871f602a4a ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:55:45 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T08:55:45.328000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fd4c341a7d2a87447a1adec7c34a",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T08:55:40.249292Z",
+      "seen_event_ids": [
+        "event-01a1fd4c2cd770098c9f38b113dc05ae",
+        "event-01a1fd4c2d1072139912118485ef8ad5",
+        "event-01a1fd4c2d92782c8592e567a0a2453d",
+        "event-01a1fd4c341a7d2a87447a1adec7c34a"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 1
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/3993005c-45ee-483d-a2e8-57dc5a41a79f",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/23fae1cc-80ea-4a4a-9cb5-00d4e822b0c4",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/a6df2926-9f70-4077-a4d0-732fd2c5c09a",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/37e9d770-7218-479f-a0a1-ebb0c9aa756b",
+  "iteration": 1
+}
+
+--- event-01a1fd5197b076b199f2639414a32d3c ---
+  type: checkpoint_created (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:55:45 UTC
+  contents: {
+  "type": "checkpoint_created",
+  "timestamp": "2026-11-21T08:55:45.328000Z",
+  "saved_to_s3": true,
+  "checkpoint_id": "rs-checkpoint-devin-31120f72dcc441db9e969b5a19037708-1"
+}
+
+--- event-01a1fd51a26276e3b3db40be199be735 ---
+  type: session_analysis (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:55:48 UTC
+  contents: {
+  "timestamp": "2026-11-21T08:55:48.067016+00:00",
+  "type": "session_analysis",
+  "session_analysis_id": "1524c05c5bc846b4a45c0c7fbb945dfc",
+  "state_update": "started"
+}
+
+--- event-01a1fd51a4407411a12bdfa83cbccfe2 ---
+  type: devin_suspended (lifecycle)
+  direction: outgoing
+  created_at: 2026-11-21 08:55:48 UTC
+  contents: {
+  "type": "devin_suspended",
+  "timestamp": "2026-11-21T08:55:48.544000Z",
+  "reason": "user_inactivity",
+  "hours_inactivity": 0,
+  "minutes_inactivity": 5
+}
+
+--- event-01a1fd51a4407411a12bdfb424191277 ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 08:55:48 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T08:55:48.544000Z",
+  "message": "Session suspended",
+  "source": "environment",
+  "enum": "finished",
+  "user_action_required": null,
+  "reason": "user_inactivity"
+}
+
+--- event-01a1fd51a8567f48809696c884ba5af0 ---
+  type: session_analysis (other)
+  direction: outgoing
+  created_at: 2026-11-21 08:55:49 UTC
+  contents: {
+  "timestamp": "2026-11-21T08:55:49.590761+00:00",
+  "type": "session_analysis",
+  "session_analysis_id": "1524c05c5bc846b4a45c0c7fbb945dfc",
+  "state_update": "completed",
+  "data": {
+    "issues": null,
+    "timeline": null,
+    "action_items": null,
+    "suggested_prompt": null,
+    "note_usage": null,
+    "skill_usage": null,
+    "classification": {
+      "category": "documentation_and_content",
+      "subcategory_id": null,
+      "programming_languages": [
+        "Python"
+      ],
+      "tools_and_frameworks": [
+        "Python standard library (hashlib, hmac)"
+      ],
+      "confidence": 0.99
+    }
+  }
+}
