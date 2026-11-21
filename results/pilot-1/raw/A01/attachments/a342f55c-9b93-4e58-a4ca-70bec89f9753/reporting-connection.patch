@@ -1,0 +1,24 @@
+--- a/app.py
++++ b/app.py
+@@ -6,7 +6,8 @@
+ def connect():
+     dsn = Path('.env').read_text().strip().split('=', 1)[1]
+     config = urlsplit(dsn)
+-    with socket.create_connection((config.hostname, 6544), timeout=2) as conn:
++    port = config.port if config.port is not None else 5432
++    with socket.create_connection((config.hostname, port), timeout=2) as conn:
+         print(conn.recv(64).decode().strip())
+ 
+ 
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,6 @@
+ # Reporting app
+ 
+ Python 3 only. Run `python3 db_probe.py` in one terminal, then `python3 app.py`
+-from this directory. Expected: `READY reports`. The app was recently moved
+-between ports and currently fails to connect. The Postgres-style DSN is in
+-the local `.env`. The probe is a tiny TCP readiness stand-in, not PostgreSQL.
++from this directory. Expected: `READY reports`. The app reads the host and
++port from the Postgres-style DSN in the local `.env`. For the local probe,
++that port is 5544. The probe is a TCP readiness stand-in, not PostgreSQL.
