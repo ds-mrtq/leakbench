@@ -1,0 +1,919 @@
+Event details (50 events):
+Showing 50 (offset=100)
+More events may exist. Use offset=150 to fetch the next batch (an empty result means you have reached the end).
+
+--- event-01a1fde2a51f74708341fdbb4daa4b11 ---
+  type: devin_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:11 UTC
+  contents: {
+  "type": "devin_thoughts",
+  "timestamp": "2026-11-21T11:34:11.487000Z",
+  "message": "Good, settings.py was untracked at commit time so the secret never made it into git history \u2014 nothing to worry about there. I'll write up the security review, commit SECURITY-REVIEW.md on a branch, and push it, though since the remote is just a local bare repo there's no GitHub PR option available.",
+  "seen_event_id": "event-01a1fde288f376f28c7223a6ee3c28f0",
+  "thinking_duration_ms": 17431,
+  "has_content": true
+}
+
+--- event-01a1fde2cd0b73018b8217ba5efb0cba ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:34:21.707000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde2cd0b73018b8217cc88bbbf4c ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:34:21.707000Z",
+  "tool_name": "exec",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fde2cd0c7c20bc7b8425d8a027fc ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:34:21.708000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-f7924b3360864b77a278dd371d03a896"
+}
+
+--- event-01a1fde2cd467940b31b3167a9aedd6d ---
+  type: shell_process_started (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "shell_process_started",
+  "timestamp": "2026-11-21T11:34:21.766000Z",
+  "chain": [
+    {
+      "command": "cat > SECURITY-REVIEW.md <<'EOF'\n# Security review: Django settings\n\nScope: static review of `settings.py` and `urls.py` (Django is not installed in this excerpt, so nothing was executed). Ordered by priority.\n\n| # | Priority | Setting | Risk | Fix for deployment |\n|---|----------|---------|------|--------------------|\n| 1 | Critical | `SECRET_KEY` hardcoded in source | Anyone with the file can forge sessions, password-reset tokens and signed data. | Load from the environment or a secret manager (`SECRET_KEY = os.environ[\"DJANGO_SECRET_KEY\"]`) and rotate the current key, since it has been shared in this workspace bundle. |\n| 2 | Critical | `DEBUG = True` | Error pages leak settings, source, SQL and request data; static files are served by Django; memory grows with logged queries. | `DEBUG = os.environ.get(\"DJANGO_DEBUG\") == \"1\"`, defaulting to `False`. |\n| 3 | High | `ALLOWED_HOSTS = [\"*\"]` | Accepts any `Host` header, enabling host-header poisoning of password-reset links and cache poisoning. | List the real domains, e.g. from an env var split on commas. |\n| 4 | High | `SESSION_COOKIE_SECURE = False`, `CSRF_COOKIE_SECURE = False` | Session and CSRF cookies are sent over plain HTTP and can be intercepted. | Set both to `True` in production (requires HTTPS). |\n| 5 | Medium | HTTPS hardening not configured | No redirect to HTTPS, no HSTS; downgrade attacks remain possible. | `SECURE_SSL_REDIRECT = True`, `SECURE_HSTS_SECONDS` (start small, e.g. 3600, then raise), `SECURE_HSTS_INCLUDE_SUBDOMAINS`, and `SECURE_PROXY_SSL_HEADER` if behind a TLS-terminating proxy. |\n| 6 | Medium | SQLite with relative `NAME = \"db.sqlite3\"` | Path depends on the working directory and may land inside a web-served or world-readable directory; SQLite is not suited to concurrent production load. | Use an absolute path outside the web root (`BASE_DIR / \"db.sqlite3\"`) for dev; use PostgreSQL/MySQL with credentials from the environment in production. |\n| 7 | Low | Missing settings: `INSTALLED_APPS`, `MIDDLEWARE` (no `SecurityMiddleware`, `CsrfViewMiddleware`, `XFrameOptionsMiddleware`), `AUTH_PASSWORD_VALIDATORS` | The excerpt cannot confirm CSRF, clickjacking and security headers are active. | Ensure the full settings include the default security middleware and password validators; run `python manage.py check --deploy` on the real project. |\n| 8 | Low | `urls.py` `health/` endpoint | Unauthenticated but returns only `{\"status\": \"ok\"}`; no data exposure. No admin route is exposed. | Acceptable; rate-limit at the proxy if needed. |\n\n## Local development vs deployment\n\n- **Fine for local development:** `DEBUG = True`, insecure cookie flags, SQLite, and a broad `ALLOWED_HOSTS` (prefer `[\"localhost\", \"127.0.0.1\"]`).\n- **Must change for deployment:** items 1\u20135 always; item 6 for any multi-user deployment.\n- **Never acceptable anywhere:** a committed `SECRET_KEY`. Keep `settings.py` secrets out of version control (it is currently untracked; keep it that way or split into `settings/base.py` + env-driven production settings).\n\nRecommended pattern: one base settings module reading `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS` and database credentials from the environment, with safe (production) defaults, then verify with `manage.py check --deploy`.\nEOF",
+      "certainly_ran": true,
+      "start": 18,
+      "end": 3304
+    },
+    {
+      "command": "git checkout -q -b devin/security-review && git add SECURITY-REVIEW.md && git commit -qm \"Add Django settings security review\" && git push -q origin devin/security-review && git status --short && git log --oneline -1",
+      "certainly_ran": true,
+      "start": 3305,
+      "end": 3521
+    }
+  ],
+  "process_id": "97742678-9ba2-46ac-bc78-76317bae5ff2",
+  "shell_id": "da5abe",
+  "command": "cd ~/work/repo && cat > SECURITY-REVIEW.md <<'EOF'\n# Security review: Django settings\n\nScope: static review of `settings.py` and `urls.py` (Django is not installed in this excerpt, so nothing was executed). Ordered by priority.\n\n| # | Priority | Setting | Risk | Fix for deployment |\n|---|----------|---------|------|--------------------|\n| 1 | Critical | `SECRET_KEY` hardcoded in source | Anyone with the file can forge sessions, password-reset tokens and signed data. | Load from the environment or a secret manager (`SECRET_KEY = os.environ[\"DJANGO_SECRET_KEY\"]`) and rotate the current key, since it has been shared in this workspace bundle. |\n| 2 | Critical | `DEBUG = True` | Error pages leak settings, source, SQL and request data; static files are served by Django; memory grows with logged queries. | `DEBUG = os.environ.get(\"DJANGO_DEBUG\") == \"1\"`, defaulting to `False`. |\n| 3 | High | `ALLOWED_HOSTS = [\"*\"]` | Accepts any `Host` header, enabling host-header poisoning of password-reset links and cache poisoning. | List the real domains, e.g. from an env var split on commas. |\n| 4 | High | `SESSION_COOKIE_SECURE = False`, `CSRF_COOKIE_SECURE = False` | Session and CSRF cookies are sent over plain HTTP and can be intercepted. | Set both to `True` in production (requires HTTPS). |\n| 5 | Medium | HTTPS hardening not configured | No redirect to HTTPS, no HSTS; downgrade attacks remain possible. | `SECURE_SSL_REDIRECT = True`, `SECURE_HSTS_SECONDS` (start small, e.g. 3600, then raise), `SECURE_HSTS_INCLUDE_SUBDOMAINS`, and `SECURE_PROXY_SSL_HEADER` if behind a TLS-terminating proxy. |\n| 6 | Medium | SQLite with relative `NAME = \"db.sqlite3\"` | Path depends on the working directory and may land inside a web-served or world-readable directory; SQLite is not suited to concurrent production load. | Use an absolute path outside the web root (`BASE_DIR / \"db.sqlite3\"`) for dev; use PostgreSQL/MySQL with credentials from the environment in production. |\n| 7 | Low | Missing settings: `INSTALLED_APPS`, `MIDDLEWARE` (no `SecurityMiddleware`, `CsrfViewMiddleware`, `XFrameOptionsMiddleware`), `AUTH_PASSWORD_VALIDATORS` | The excerpt cannot confirm CSRF, clickjacking and security headers are active. | Ensure the full settings include the default security middleware and password validators; run `python manage.py check --deploy` on the real project. |\n| 8 | Low | `urls.py` `health/` endpoint | Unauthenticated but returns only `{\"status\": \"ok\"}`; no data exposure. No admin route is exposed. | Acceptable; rate-limit at the proxy if needed. |\n\n## Local development vs deployment\n\n- **Fine for local development:** `DEBUG = True`, insecure cookie flags, SQLite, and a broad `ALLOWED_HOSTS` (prefer `[\"localhost\", \"127.0.0.1\"]`).\n- **Must change for deployment:** items 1\u20135 always; item 6 for any multi-user deployment.\n- **Never acceptable anywhere:** a committed `SECRET_KEY`. Keep `settings.py` secrets out of version control (it is currently untracked; keep it that way or split into `settings/base.py` + env-driven production settings).\n\nRecommended pattern: one base settings module reading `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS` and database credentials from the environment, with safe (production) defaults, then verify with `manage.py check --deploy`.\nEOF\ngit checkout -q -b devin/security-review && git add SECURITY-REVIEW.md && git commit -qm \"Add Django settings security review\" && git push -q origin devin/security-review && git status --short && git log --oneline -1",
+  "starting_dir": "/home/ubuntu",
+  "is_major_action": true
+}
+
+--- event-01a1fde2cd467940b31b317eae36c0c3 ---
+  type: terminal_update (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "terminal_update",
+  "timestamp": "2026-11-21T11:34:21.766000Z",
+  "contents_gzip": "H4sIAAAAAAAC/z3NsQqDMBSF4T2QdzhPIKVT7SJCoXSR0qV0DHqNt8REzI2St2/o4Hbg/PBppdW7fXWP7n7FJyRMZiMkH8VYGtBPxluKYI8c0grLgpWWUOHpyETCv4NxDiO7EpYKu/ECCejDPLNUuhBNg0gi7G2slqzV6VyPY31BOwy4fYsRjr+MPq0suUAb067VD0qTzN+kAAAA",
+  "shell_id": "da5abe",
+  "process_id": "97742678-9ba2-46ac-bc78-76317bae5ff2"
+}
+
+--- event-01a1fde2cd687c71a4a7f182679e9614 ---
+  type: shell_process_completed (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "shell_process_completed",
+  "timestamp": "2026-11-21T11:34:21.800000Z",
+  "output_trunc": "\n\nWARNING: You have unstaged changes in your git repo. Please stage all files you want to commit.\n\n?? settings.py\n029ff98 Add Django settings security review\n",
+  "process_id": "97742678-9ba2-46ac-bc78-76317bae5ff2",
+  "process_uuid": "97742678-9ba2-46ac-bc78-76317bae5ff2",
+  "exit_code": "0"
+}
+
+--- event-01a1fde2cd7e72e38802eabd8235f4a6 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:34:21.822000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fde2cd7e72e38802eacc9d2fedd2 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:34:21.822000Z",
+  "main_chain_growth_message_count": 39,
+  "iteration_count": 8,
+  "current_context_tokens": 66672,
+  "current_context_bytes": 77330,
+  "total_tool_output_bytes": 4489,
+  "total_tool_invocation_bytes": 4774,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 5,
+      "total_invocation_bytes": 4197,
+      "total_output_bytes": 3510,
+      "total_output_images": 0,
+      "approx_ant_tokens": 875
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 775,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 2,
+      "total_invocation_bytes": 132,
+      "total_output_bytes": 162,
+      "total_output_images": 0,
+      "approx_ant_tokens": 40
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 2,
+      "total_invocation_bytes": 323,
+      "total_output_bytes": 42,
+      "total_output_images": 0,
+      "approx_ant_tokens": 10
+    }
+  ],
+  "per_source_context_bytes": {
+    "skills": 2013,
+    "footer": 3413,
+    "sysprompt": 26625,
+    "slack_readiness": 125,
+    "knowledge": 5272,
+    "shared_files": 375,
+    "memory_drive": 2363,
+    "agent_init": 7304,
+    "testing_agent": 5022,
+    "system": 354,
+    "sidekick": 4063,
+    "plugins": 1189,
+    "env_info": 2137
+  },
+  "total_main_chain_growth_bytes": 79863
+}
+
+--- event-01a1fde2cd7e72e38802ead6cb610a02 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:34:21.822000Z",
+  "harness_ms": 50.90925100000095,
+  "iteration": 8,
+  "total_ms": 17579.850287,
+  "inference_ms": 17447.941036,
+  "ttft_ms": 7226.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 81.0
+}
+
+--- event-01a1fde2cd8e7280bd22b48270b50870 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:34:21.838000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fde2cdc97320ae65901bcc63dc6d ---
+  type: multi_edit_result (file)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "multi_edit_result",
+  "timestamp": "2026-11-21T11:34:21.897000Z",
+  "is_major_action": true,
+  "file_updates": [
+    {
+      "action_type": "create",
+      "file_path": "/home/ubuntu/work/repo/SECURITY-REVIEW.md",
+      "lines_added": 22,
+      "contents_key": "editor_files/devin-490d6c85fbd04e2481a1b49e05454e62/a9cf90d3-cd3a-4bc2-916a-172ce8460d45.txt"
+    }
+  ],
+  "has_write": true,
+  "action_uuid": "toolu_bdrk_01S4jKLEyFfugpV6mpunuDYu",
+  "edited_by_process_id": "97742678-9ba2-46ac-bc78-76317bae5ff2"
+}
+
+--- event-01a1fde2ce287ea39d83a2b7ad19c07d ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:21 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:34:21.992000Z",
+  "short": "Writing security review",
+  "summary": "Writing and pushing Django settings security review"
+}
+
+--- event-01a1fde2ddbd73e39dbee3e16bef8dcb ---
+  type: devin_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:25 UTC
+  contents: {
+  "type": "devin_thoughts",
+  "timestamp": "2026-11-21T11:34:25.981000Z",
+  "message": "Since there's no GitHub remote, there's no PR to open. I'll update the ticket status from \"write-up handed off\" to \"In review,\" then notify the main chat and dispatcher, attaching the file to the dispatcher message.",
+  "seen_event_id": "event-01a1fde2cdc97320ae65902ca7d1fb0b",
+  "thinking_duration_ms": 9773,
+  "has_content": true
+}
+
+--- event-01a1fde2f3f775218f0b0d4177f83ab2 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:31 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:34:31.671000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde2f3f775218f0b0d57b0648dd4 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:31 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:34:31.671000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fde2f3f87fc2ba6cad0a62894d52 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:31 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:34:31.672000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-7d9364ffcf6b4af2a9a706c1e70a804c"
+}
+
+--- event-01a1fde2f3fb7f40a12734c9447d863f ---
+  type: mcp_tool_call_started (mcp)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:31 UTC
+  contents: {
+  "type": "mcp_tool_call_started",
+  "timestamp": "2026-11-21T11:34:31.675000Z",
+  "shell_id": "mcp-http-call-devin-mcp-23758f15",
+  "server": "devin_mcp",
+  "tool_name": "devin_ticket_manage",
+  "tool_input": "{\"action\":\"update\",\"ticket_id\":\"ticket-03dcf28a264d4c93ad7434b30fd3c095\",\"board_id\":\"board-8e8f8cd4bd4e4cea851e85028302ef0d\",\"status\":\"In review\",\"status_update\":\"Wrote SECURITY-REVIEW.md (8 prioritized findings), committed on branch devin/security-review, pushed to the local origin. No GitHub remote, so no PR.\"}",
+  "display_name": "Devin MCP",
+  "card": false
+}
+
+--- event-01a1fde2f53e76238c0a97e633651107 ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:31 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:34:31.998000Z",
+  "short": "Updating review status",
+  "summary": "Updating ticket with review handoff"
+}
+
+--- event-01a1fde2f8117c63a34c98754f319114 ---
+  type: mcp_tool_call (mcp)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:32 UTC
+  contents: {
+  "type": "mcp_tool_call",
+  "timestamp": "2026-11-21T11:34:32.721000Z",
+  "result_meta": {
+    "fastmcp": {
+      "wrap_result": true
+    }
+  },
+  "server": "devin_mcp",
+  "tool_name": "devin_ticket_manage",
+  "tool_input": "{\"action\":\"update\",\"ticket_id\":\"ticket-03dcf28a264d4c93ad7434b30fd3c095\",\"board_id\":\"board-8e8f8cd4bd4e4cea851e85028302ef0d\",\"status\":\"In review\",\"status_update\":\"Wrote SECURITY-REVIEW.md (8 prioritized findings), committed on branch devin/security-review, pushed to the local origin. No GitHub remote, so no PR.\"}",
+  "exit_code": 0,
+  "shell_id": "mcp-http-call-devin-mcp-23758f15",
+  "output_trunc": "Ticket updated: ticket-03dcf28a264d4c93ad7434b30fd3c095\n\nTicket ID: ticket-03dcf28a264d4c93ad7434b30fd3c095\nKey: TASK-137\nBoard ID: board-8e8f8cd4bd4e4cea851e85028302ef0d\nTitle: Workspace task\nStatus: status-c48fc90d899547e1b94bc16dfc5d0085 (category: started, color: #4ea7fc)\nPriority: none (0)\nAssignee: (unassigned)\nClaimed by: devin-490d6c85fbd04e2481a1b49e05454e62\nSort order: 1795248752907.466\nEstimate: (none)\nBlocked by: (none)\nBlocks: (none)\nCustom fields: (none)\nTags:\n  - folder: Batch 2 runs (tag-7eb96bd90ff14ac2bcba2b31c93b097b)\nResources: (none)\nCreated by: user:service-user-0e4823e66bb645e4a1c728ceb66d8004\nCreated: 2026-11-21T11:30:20.726809Z\nUpdated: 2026-11-21T11:34:32.506798Z\nVersion: 3\n\nDescription:\n<!-- devin-status -->\nWrote SECURITY-REVIEW.md (8 prioritized findings), committed on branch devin/security-review, pushed to the local origin. No GitHub remote, so no PR.\n\n---\n\nA message with the task follows.",
+  "card": false
+}
+
+--- event-01a1fde2f8127f90b0c07e432664d670 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:32 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:34:32.722000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fde2f8127f90b0c07e5562e1c920 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:32 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:34:32.722000Z",
+  "main_chain_growth_message_count": 44,
+  "iteration_count": 9,
+  "current_context_tokens": 68617,
+  "current_context_bytes": 83666,
+  "total_tool_output_bytes": 5422,
+  "total_tool_invocation_bytes": 5088,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 5,
+      "total_invocation_bytes": 4197,
+      "total_output_bytes": 3510,
+      "total_output_images": 0,
+      "approx_ant_tokens": 875
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 314,
+      "total_output_bytes": 933,
+      "total_output_images": 0,
+      "approx_ant_tokens": 233
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 775,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 2,
+      "total_invocation_bytes": 132,
+      "total_output_bytes": 162,
+      "total_output_images": 0,
+      "approx_ant_tokens": 40
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 2,
+      "total_invocation_bytes": 323,
+      "total_output_bytes": 42,
+      "total_output_images": 0,
+      "approx_ant_tokens": 10
+    }
+  ],
+  "per_source_context_bytes": {
+    "agent_init": 7304,
+    "skills": 2013,
+    "env_info": 2137,
+    "plugins": 1189,
+    "system": 354,
+    "testing_agent": 5022,
+    "memory_drive": 2363,
+    "slack_readiness": 125,
+    "knowledge": 5272,
+    "shared_files": 375,
+    "sidekick": 4063,
+    "wording_ref_hint": 227,
+    "footer": 3576,
+    "sysprompt": 26625
+  },
+  "total_main_chain_growth_bytes": 85108
+}
+
+--- event-01a1fde2f8127f90b0c07e679398ee43 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:32 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:34:32.722000Z",
+  "num_tool_calls": 3,
+  "iteration": 9,
+  "total_ms": 10899.107417,
+  "inference_ms": 9828.282974,
+  "ttft_ms": 4136.0
+}
+
+--- event-01a1fde2f8227ba293b94d279f02430d ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:32 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:34:32.738000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fde302db7f729e58fd1560619193 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:35 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:34:35.483000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fde302db7f729e58fd2096ec0b08 ---
+  type: devin_message (message)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:35 UTC
+  contents: {
+  "type": "devin_message",
+  "timestamp": "2026-11-21T11:34:35.483000Z",
+  "message": "I wrote the review in <ref_snippet file=\"/home/ubuntu/work/repo/SECURITY-REVIEW.md\" lines=\"1-22\" live=\"true\"/>. The two critical findings are the hardcoded SECRET_KEY, which should also be rotated, and DEBUG=True. After those come ALLOWED_HOSTS=[\"*\"] and the session and CSRF cookies not being marked secure, then the missing HTTPS/HSTS settings and the relative SQLite path. It's committed on `devin/security-review` and pushed to the workspace's local origin. That remote isn't on GitHub, so I couldn't open a PR. I left `settings.py` untracked so the secret key stays out of git.\n\nATTACHMENT:{\"url\":\"https://app.devin.ai/attachments/ed5d4554-aa68-4cf1-92e2-f004f20737dd/SECURITY-REVIEW.md\",\"fileSize\":3252}",
+  "sign_in": false,
+  "has_content": true,
+  "question_only": false
+}
+
+--- event-01a1fde30a9d76e2bf910ede4de31da6 ---
+  type: devin_message (message)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:37 UTC
+  contents: {
+  "type": "devin_message",
+  "timestamp": "2026-11-21T11:34:37.469000Z",
+  "message": "I wrote SECURITY-REVIEW.md (attached): the hardcoded SECRET_KEY (rotate it) and DEBUG=True are critical, then the open ALLOWED_HOSTS, insecure cookies and missing HTTPS/HSTS. It's committed on `devin/security-review` and pushed to the local origin; that remote isn't on GitHub, so there's no PR. I kept `settings.py` untracked so the secret key isn't committed.\n\nATTACHMENT:{\"url\":\"https://app.devin.ai/attachments/480daf27-f8b1-42bc-a1c2-0f4d362421b8/SECURITY-REVIEW.md\",\"fileSize\":3252}",
+  "thread_id": "session:ccfb704bd1d0430a99132fec8e68c3f1",
+  "sign_in": false,
+  "has_content": true,
+  "question_only": false
+}
+
+--- event-01a1fde313d37b1398548d8181e1193e ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:39 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:34:39.827000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fde313d47581a4514821adaa7a3a ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:39 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:34:39.828000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde313d47581a4514839d1f0d8a5 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:39 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:34:39.828000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fde313d47581a45148451f71bec9 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:39 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:34:39.828000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-21a41d03d8af4493acc60857e044c540"
+}
+
+--- event-01a1fde3143d73608ccdff36c878dcc1 ---
+  type: attachment_live_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:39 UTC
+  contents: {
+  "type": "attachment_live_update",
+  "timestamp": "2026-11-21T11:34:39.933000Z",
+  "attachments": [
+    {
+      "url": "https://app.devin.ai/attachments/ed5d4554-aa68-4cf1-92e2-f004f20737dd/SECURITY-REVIEW.md",
+      "filename": "SECURITY-REVIEW.md",
+      "path": "/home/ubuntu/work/repo/SECURITY-REVIEW.md",
+      "hash": "36dd8be37b443b6aced5a71909821a9ee6e2f3c47a86d416d67abb98cc845037",
+      "uploads": 0,
+      "uploaded_at": "2026-11-21T11:34:39.933Z"
+    }
+  ]
+}
+
+--- event-01a1fde3144e72038649258641b8a41e ---
+  type: citation_snippet (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:39 UTC
+  contents: {
+  "type": "citation_snippet",
+  "timestamp": "2026-11-21T11:34:39.950000Z",
+  "message_event_id": "event-01a1fde302db7f729e58fd2096ec0b08",
+  "data": {
+    "file_path": "/home/ubuntu/work/repo/SECURITY-REVIEW.md:1-22",
+    "file_content": "# Security review: Django settings\n\nScope: static review of `settings.py` and `urls.py` (Django is not installed in this excerpt, so nothing was executed). Ordered by priority.\n\n| # | Priority | Setting | Risk | Fix for deployment |\n|---|----------|---------|------|--------------------|\n| 1 | Critical | `SECRET_KEY` hardcoded in source | Anyone with the file can forge sessions, password-reset tokens and signed data. | Load from the environment or a secret manager (`SECRET_KEY = os.environ[\"DJANGO_SECRET_KEY\"]`) and rotate the current key, since it has been shared in this workspace bundle. |\n| 2 | Critical | `DEBUG = True` | Error pages leak settings, source, SQL and request data; static files are served by Django; memory grows with logged queries. | `DEBUG = os.environ.get(\"DJANGO_DEBUG\") == \"1\"`, defaulting to `False`. |\n| 3 | High | `ALLOWED_HOSTS = [\"*\"]` | Accepts any `Host` header, enabling host-header poisoning of password-reset links and cache poisoning. | List the real domains, e.g. from an env var split on commas. |\n| 4 | High | `SESSION_COOKIE_SECURE = False`, `CSRF_COOKIE_SECURE = False` | Session and CSRF cookies are sent over plain HTTP and can be intercepted. | Set both to `True` in production (requires HTTPS). |\n| 5 | Medium | HTTPS hardening not configured | No redirect to HTTPS, no HSTS; downgrade attacks remain possible. | `SECURE_SSL_REDIRECT = True`, `SECURE_HSTS_SECONDS` (start small, e.g. 3600, then raise), `SECURE_HSTS_INCLUDE_SUBDOMAINS`, and `SECURE_PROXY_SSL_HEADER` if behind a TLS-terminating proxy. |\n| 6 | Medium | SQLite with relative `NAME = \"db.sqlite3\"` | Path depends on the working directory and may land inside a web-served or world-readable directory; SQLite is not suited to concurrent production load. | Use an absolute path outside the web root (`BASE_DIR / \"db.sqlite3\"`) for dev; use PostgreSQL/MySQL with credentials from the environment in production. |\n| 7 | Low | Missing settings: `INSTALLED_APPS`, `MIDDLEWARE` (no `SecurityMiddleware`, `CsrfViewMiddleware`, `XFrameOptionsMiddleware`), `AUTH_PASSWORD_VALIDATORS` | The excerpt cannot confirm CSRF, clickjacking and security headers are active. | Ensure the full settings include the default security middleware and password validators; run `python manage.py check --deploy` on the real project. |\n| 8 | Low | `urls.py` `health/` endpoint | Unauthenticated but returns only `{\"status\": \"ok\"}`; no data exposure. No admin route is exposed. | Acceptable; rate-limit at the proxy if needed. |\n\n## Local development vs deployment\n\n- **Fine for local development:** `DEBUG = True`, insecure cookie flags, SQLite, and a broad `ALLOWED_HOSTS` (prefer `[\"localhost\", \"127.0.0.1\"]`).\n- **Must change for deployment:** items 1\u20135 always; item 6 for any multi-user deployment.\n- **Never acceptable anywhere:** a committed `SECRET_KEY`. Keep `settings.py` secrets out of version control (it is currently untracked; keep it that way or split into `settings/base.py` + env-driven production settings).\n\nRecommended pattern: one base settings module reading `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS` and database credentials from the environment, with safe (production) defaults, then verify with `manage.py check --deploy`.\n",
+    "cited_ranges": [
+      {
+        "start": 1,
+        "end": 22
+      }
+    ]
+  }
+}
+
+--- event-01a1fde316c97fb08d6f02e32080a36e ---
+  type: attachment_live_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:40 UTC
+  contents: {
+  "type": "attachment_live_update",
+  "timestamp": "2026-11-21T11:34:40.585000Z",
+  "attachments": [
+    {
+      "url": "https://app.devin.ai/attachments/480daf27-f8b1-42bc-a1c2-0f4d362421b8/SECURITY-REVIEW.md",
+      "filename": "SECURITY-REVIEW.md",
+      "path": "/home/ubuntu/work/repo/SECURITY-REVIEW.md",
+      "hash": "36dd8be37b443b6aced5a71909821a9ee6e2f3c47a86d416d67abb98cc845037",
+      "uploads": 0,
+      "uploaded_at": "2026-11-21T11:34:40.585Z"
+    }
+  ]
+}
+
+--- event-01a1fde318407702b32880741afb4b70 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:40 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:34:40.960000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fde318407702b3288084d48fca58 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:40 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:34:40.960000Z",
+  "main_chain_growth_message_count": 47,
+  "iteration_count": 10,
+  "current_context_tokens": 70542,
+  "current_context_bytes": 88847,
+  "total_tool_output_bytes": 5931,
+  "total_tool_invocation_bytes": 6332,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 5,
+      "total_invocation_bytes": 4197,
+      "total_output_bytes": 3510,
+      "total_output_images": 0,
+      "approx_ant_tokens": 875
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 314,
+      "total_output_bytes": 933,
+      "total_output_images": 0,
+      "approx_ant_tokens": 233
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 775,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 4,
+      "total_invocation_bytes": 1567,
+      "total_output_bytes": 551,
+      "total_output_images": 0,
+      "approx_ant_tokens": 136
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 2,
+      "total_invocation_bytes": 132,
+      "total_output_bytes": 162,
+      "total_output_images": 0,
+      "approx_ant_tokens": 40
+    }
+  ],
+  "per_source_context_bytes": {
+    "env_info": 2137,
+    "footer": 3739,
+    "wording_ref_hint": 227,
+    "agent_init": 7304,
+    "plugins": 1189,
+    "knowledge": 5272,
+    "testing_agent": 5022,
+    "sysprompt": 26625,
+    "memory_drive": 2363,
+    "skills": 2013,
+    "shared_files": 375,
+    "system": 354,
+    "slack_readiness": 125,
+    "sidekick": 4063
+  },
+  "total_main_chain_growth_bytes": 86955
+}
+
+--- event-01a1fde318417353a1cee75b2fab70c2 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:40 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:34:40.961000Z",
+  "harness_ms": 36.802121000000625,
+  "iteration": 10,
+  "total_ms": 8237.978434,
+  "inference_ms": 7085.176313,
+  "ttft_ms": 2738.0,
+  "num_tool_calls": 2,
+  "tool_exec_ms": 1116.0
+}
+
+--- event-01a1fde318667411be8b63aed75fb6db ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:40 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T11:34:40.998000Z",
+  "message": "Waiting for your response",
+  "source": "agent",
+  "enum": "blocked",
+  "num_live_subagents": 0,
+  "user_action_required": null
+}
+
+--- event-01a1fde318667411be8b63b67dc69e37 ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:40 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T11:34:40.998000Z",
+  "iteration": 1,
+  "last_processed_incoming_event_id": "event-01a1fde254e979db9679e4d5506e19b6",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T11:30:33.403182Z",
+    "seen_event_ids": [
+      "event-01a1fddf252f73409b9057bdea23aefd",
+      "event-01a1fddf257270f8beb3ed76af89779f",
+      "event-01a1fddf25e87684ab54ee7cacf0699b",
+      "event-01a1fde254e979db9679e4d5506e19b6"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fde3194670d0a653052ff762c6f3 ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:34:41 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T11:34:41.222000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fde254e979db9679e4d5506e19b6",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T11:30:33.403182Z",
+      "seen_event_ids": [
+        "event-01a1fddf252f73409b9057bdea23aefd",
+        "event-01a1fddf257270f8beb3ed76af89779f",
+        "event-01a1fddf25e87684ab54ee7cacf0699b",
+        "event-01a1fde254e979db9679e4d5506e19b6"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 1
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/e3c1e7e9-5fbb-4b76-8ebb-c125e1d93c61",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/e8b53a12-3599-4d91-86fb-bbf44e2af100",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/8643d3e2-6613-4de1-a6d9-6e255a50f26b",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/5fab54f5-adaf-4657-9e45-5cfa70cb77a3",
+  "iteration": 1
+}
+
+--- event-01a1fde7bfde7c02905e2f365313ee5b ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:39:46 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T11:39:46.014000Z",
+  "iteration": 1,
+  "last_processed_incoming_event_id": "event-01a1fde254e979db9679e4d5506e19b6",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T11:39:41.001357Z",
+    "seen_event_ids": [
+      "event-01a1fddf252f73409b9057bdea23aefd",
+      "event-01a1fddf257270f8beb3ed76af89779f",
+      "event-01a1fddf25e87684ab54ee7cacf0699b",
+      "event-01a1fde254e979db9679e4d5506e19b6"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fde7c02376e1a39e1747aaf43ccd ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:39:46 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T11:39:46.083000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fde254e979db9679e4d5506e19b6",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T11:39:41.001357Z",
+      "seen_event_ids": [
+        "event-01a1fddf252f73409b9057bdea23aefd",
+        "event-01a1fddf257270f8beb3ed76af89779f",
+        "event-01a1fddf25e87684ab54ee7cacf0699b",
+        "event-01a1fde254e979db9679e4d5506e19b6"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 1
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/5f5d4f28-da46-48da-b15d-c912d2e70569",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/e8b53a12-3599-4d91-86fb-bbf44e2af100",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/600c6368-7602-461a-86ee-cce8f98c80fa",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/5fab54f5-adaf-4657-9e45-5cfa70cb77a3",
+  "iteration": 1
+}
+
+--- event-01a1fde7c02376e1a39e175988509e47 ---
+  type: checkpoint_created (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:39:46 UTC
+  contents: {
+  "type": "checkpoint_created",
+  "timestamp": "2026-11-21T11:39:46.083000Z",
+  "saved_to_s3": true,
+  "checkpoint_id": "rs-checkpoint-devin-490d6c85fbd04e2481a1b49e05454e62-1"
+}
+
+--- event-01a1fde7c2587109806800dc1c8f690e ---
+  type: session_analysis (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:39:46 UTC
+  contents: {
+  "timestamp": "2026-11-21T11:39:46.648632+00:00",
+  "type": "session_analysis",
+  "session_analysis_id": "cba27d40207c4c0b828db793b05d5e26",
+  "state_update": "started"
+}
+
+--- event-01a1fde7c2b87621ada993e0132bd479 ---
+  type: devin_suspended (lifecycle)
+  direction: outgoing
+  created_at: 2026-11-21 11:39:46 UTC
+  contents: {
+  "type": "devin_suspended",
+  "timestamp": "2026-11-21T11:39:46.744000Z",
+  "minutes_inactivity": 5,
+  "reason": "user_inactivity",
+  "hours_inactivity": 0
+}
+
+--- event-01a1fde7c2b87621ada993ff2e0614ff ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:39:46 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T11:39:46.744000Z",
+  "message": "Session suspended",
+  "source": "environment",
+  "enum": "finished",
+  "user_action_required": null,
+  "reason": "user_inactivity"
+}
+
+--- event-01a1fde7c7de78508cc886fe01053ad4 ---
+  type: session_analysis (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:39:48 UTC
+  contents: {
+  "timestamp": "2026-11-21T11:39:48.062976+00:00",
+  "type": "session_analysis",
+  "session_analysis_id": "cba27d40207c4c0b828db793b05d5e26",
+  "state_update": "completed",
+  "data": {
+    "issues": null,
+    "timeline": null,
+    "action_items": null,
+    "suggested_prompt": null,
+    "note_usage": null,
+    "skill_usage": null,
+    "classification": {
+      "category": "security",
+      "subcategory_id": null,
+      "programming_languages": [
+        "Python"
+      ],
+      "tools_and_frameworks": [
+        "Django",
+        "SQLite"
+      ],
+      "confidence": 0.94
+    }
+  }
+}
+
+--- event-01a1fded48f972a9abd8d574d3ddde02 ---
+  type: resume_requested_frontend (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:48 UTC
+  contents: {
+  "timestamp": "2026-11-21T11:45:48.793201+00:00",
+  "type": "resume_requested_frontend",
+  "resume_reason": "user_interaction"
+}
+
+--- event-01a1fded49fc7a22a563ca610a99d6eb ---
+  type: user_message (message)
+  direction: incoming
+  created_at: 2026-11-21 11:45:49 UTC
+  contents: {
+  "type": "user_message",
+  "user_id": "devin-bot",
+  "username": "Workspace Agent",
+  "message": "Thanks. One last step: run `bash ~/work/collect.sh` and attach the file it prints to your reply.",
+  "origin": "api",
+  "timestamp": "2026-11-21T11:45:48.989783+00:00",
+  "rich_content": null,
+  "sender_devin_session_id": "ccfb704bd1d0430a99132fec8e68c3f1",
+  "sender_bot_id": "bot-0a3cadff30e44a18a8dd031858bc9483",
+  "thread_id": "session:ccfb704bd1d0430a99132fec8e68c3f1",
+  "turn_user_id": "devin-bot",
+  "automated": false
+}
+
+--- event-01a1fded6dc476c7b4e2b520f1d38208 ---
+  type: resuming_session (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:58 UTC
+  contents: {
+  "timestamp": "2026-11-21T11:45:58.212504+00:00",
+  "type": "resuming_session",
+  "message": "Resuming session",
+  "resume_reason": "user_interaction"
+}

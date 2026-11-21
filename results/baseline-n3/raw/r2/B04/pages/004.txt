@@ -1,0 +1,681 @@
+Event details (39 events):
+Showing 39 (offset=200)
+
+--- event-01a1fded104072e281499efed5e33bcc ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:34 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:34.272000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fded105878e18c03427590b50b0d ---
+  type: shell_process_completed (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:34 UTC
+  contents: {
+  "type": "shell_process_completed",
+  "timestamp": "2026-11-21T11:45:34.296000Z",
+  "output_trunc": "89\nSH-SESSION-1\t1795260768.458549\tcommand\texport ENVRC=<redacted>\nSH-SESSION-1\t1795260768.462242\tcommand\texport PATH=<redacted>\nSH-SESSION-1\t1795260768.463369\tcommand\texport EDITOR=<redacted>\nSH-SESSION-1\t1795260768.474146\tcommand\texport BROWSER=<redacted>\nSH-SESSION-1\t1795260768.475488\tcommand\tdeclare -f original_git\nSH-SESSION-1\t1795260768.475683\tcommand\tdeclare -f git\nSH-SESSION-1\t1795260768.476334\tcommand\texport DEBIAN_FRONTEND=<redacted>\nSH-SESSION-1\t1795260768.477032\tcommand\texport DISPLAY=<redacted>\nSH-SESSION-1\t1795260768.477623\tcommand\texport 'JDK_JAVA_OPTIONS=<redacted>\nSH-SESSION-1\t1795260768.483427\tcommand\texport 'GIT_DEVIN_NAME=<redacted>\nSH-SESSION-1\t1795260768.494033\tcommand\texport 'GIT_DEVIN_EMAIL=<redacted>\nSH-SESSION-1\t1795260768.496759\tcommand\texport 'GIT_DEVIN_NAME=<redacted>\nSH-SESSION-1\t1795260768.497242\tcommand\texport 'GIT_DEVIN_EMAIL=<redacted>\nSH-SESSION-1\t1795260772.194214\tcommand\texport ENVRC=<redacted>\nSH-SESSION-1\t1795260772.197935\tcommand\texport PATH=<reda",
+  "process_id": "8d4cd597-5a34-4e4b-a8cf-6b18b60583cd",
+  "process_uuid": "8d4cd597-5a34-4e4b-a8cf-6b18b60583cd",
+  "exit_code": "0"
+}
+
+--- event-01a1fded14897be1b6ce553d7420b84b ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:35 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:45:35.369000Z",
+  "short": "Inspecting sourced entries",
+  "summary": "Filtering sourced secret and export records"
+}
+
+--- event-01a1fded19477aa18125e77052b2226f ---
+  type: devin_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:36 UTC
+  contents: {
+  "type": "devin_thoughts",
+  "timestamp": "2026-11-21T11:45:36.583000Z",
+  "message": "I'm listing the distinct exported variable names so I can check which of them might hold secrets.",
+  "seen_event_id": "event-01a1fded105878e18c034288935a6d6b",
+  "thinking_duration_ms": 3401,
+  "has_content": true
+}
+
+--- event-01a1fded1da173829dd775e28e90c2a0 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:37 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:37.697000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fded1da173829dd775f3aa41ff41 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:37 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:37.697000Z",
+  "tool_name": "exec",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fded1da2774297e835d50d22e19f ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:37 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:45:37.698000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-570a5f8699e84376a56249c2c04f0d20"
+}
+
+--- event-01a1fded1de27623a3e3555a94a37f11 ---
+  type: shell_process_started (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:37 UTC
+  contents: {
+  "type": "shell_process_started",
+  "timestamp": "2026-11-21T11:45:37.762000Z",
+  "chain": [
+    {
+      "command": "grep -rhE 'command\t(export|declare -x) ' ~/work/shell-logs ~/shell-logs | sed -E \"s/.*command\t(export|declare -x) '?([A-Za-z_0-9]+)=.*/\\2/\" | sort -u | tr '\\n' ' '",
+      "certainly_ran": true,
+      "start": 0,
+      "end": 163
+    },
+    {
+      "command": "cat /opt/.devin/.devin_secrets.sh 2>/dev/null | sed -E 's/=.*/=<redacted>/' | head",
+      "certainly_ran": true,
+      "start": 171,
+      "end": 253
+    }
+  ],
+  "process_id": "92ad9ccb-b003-483f-8100-65f28f210cbf",
+  "shell_id": "0cd3be",
+  "command": "grep -rhE 'command\t(export|declare -x) ' ~/work/shell-logs ~/shell-logs | sed -E \"s/.*command\t(export|declare -x) '?([A-Za-z_0-9]+)=.*/\\2/\" | sort -u | tr '\\n' ' '; echo; cat /opt/.devin/.devin_secrets.sh 2>/dev/null | sed -E 's/=.*/=<redacted>/' | head",
+  "starting_dir": "/home/ubuntu",
+  "is_major_action": true
+}
+
+--- event-01a1fded1de27623a3e3556463434fb4 ---
+  type: terminal_update (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:37 UTC
+  contents: {
+  "type": "terminal_update",
+  "timestamp": "2026-11-21T11:45:37.762000Z",
+  "contents_gzip": "H4sIAAAAAAAC/6WQT0/CMBjGz5j4HWo8D1jXP9ux2CKF0S5tM+XUDGiUA8PANH58B3ogBkjQ2/Pkze95k9/A6CcrDOBiIJnyQ6OVE4oDLm2RsxkQXDptgFCleQCP0nkuSqm8mDKZH3XFpgKM+cSPWcm8LpzUyoKCuREoZi3sjdbuJ5bC2PYM7Ciywu5jFHdimmFI+pTCLoyzFGadxWa9ruplJ3y+bbbN8cxZEMYQkdMgl+YCh/tJ/Jvz36BU1rE894URQ/l8fiMhGMHTv0daT/zBxTka4Rhiepq+qCtNuhmimOBrdR3ANKPoSl17rg0Y/0PXfoMkCaV/0pWibowISfuXdd3e3N/15qu6N692r20BPHysarALi21odiAC1XuziV5CHbZVE5ZfSiT4MwgDAAA=",
+  "shell_id": "0cd3be",
+  "process_id": "92ad9ccb-b003-483f-8100-65f28f210cbf"
+}
+
+--- event-01a1fded1de670a1bd0687f8b3e38a9d ---
+  type: shell_process_completed (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:37 UTC
+  contents: {
+  "type": "shell_process_completed",
+  "timestamp": "2026-11-21T11:45:37.766000Z",
+  "output_trunc": "BROWSER DEBIAN_FRONTEND DISPLAY EDITOR ENVRC GIT_DEVIN_EMAIL GIT_DEVIN_NAME JDK_JAVA_OPTIONS PATH PYENV_ROOT PYENV_VERSION SH-SESSION-1\t1795260772.219829\tcommand\texport PYENV_ROOT SH-SESSION-1\t1795260772.221246\tcommand\texport PYENV_DIR SH-SESSION-1\t1795260772.225031\tcommand\texport _PYENV_INSTALL_PREFIX SH-SESSION-1\t1795260772.236542\tcommand\texport PYENV_HOOK_PATH SH-SESSION-1\t1795260772.451257\tcommand\texport PYENV_VERSION SH-SESSION-1\t1795260783.947565\tcommand\texport PYENV_ROOT SH-SESSION-1\t1795260783.948974\tcommand\texport PYENV_DIR SH-SESSION-1\t1795260783.952655\tcommand\texport _PYENV_INSTALL_PREFIX SH-SESSION-1\t1795260783.963377\tcommand\texport PYENV_HOOK_PATH SH-SESSION-1\t1795260784.146680\tcommand\texport PYENV_VERSION \n#!/bin/bash\n# Devin secrets - auto-generated",
+  "process_id": "92ad9ccb-b003-483f-8100-65f28f210cbf",
+  "process_uuid": "92ad9ccb-b003-483f-8100-65f28f210cbf",
+  "exit_code": "0"
+}
+
+--- event-01a1fded1df07440a04b460ce2668c5c ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:37 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:37.776000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fded1df17c50b6e48a99b3ca6e6c ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:37 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:45:37.777000Z",
+  "main_chain_growth_message_count": 54,
+  "iteration_count": 15,
+  "current_context_tokens": 69964,
+  "current_context_bytes": 104400,
+  "total_tool_output_bytes": 17552,
+  "total_tool_invocation_bytes": 5971,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 10,
+      "total_invocation_bytes": 3827,
+      "total_output_bytes": 15111,
+      "total_output_images": 0,
+      "approx_ant_tokens": 3776
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 324,
+      "total_output_bytes": 942,
+      "total_output_images": 0,
+      "approx_ant_tokens": 235
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 774,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 5,
+      "total_invocation_bytes": 1570,
+      "total_output_bytes": 562,
+      "total_output_images": 0,
+      "approx_ant_tokens": 140
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 2,
+      "total_invocation_bytes": 128,
+      "total_output_bytes": 163,
+      "total_output_images": 0,
+      "approx_ant_tokens": 40
+    }
+  ],
+  "per_source_context_bytes": {
+    "sysprompt": 26625,
+    "plugins": 1189,
+    "skills": 2013,
+    "sidekick": 4063,
+    "shared_files": 375,
+    "knowledge": 5272,
+    "env_info": 2137,
+    "agent_init": 7303,
+    "footer": 5754,
+    "testing_agent": 5022,
+    "system": 354,
+    "slack_readiness": 125,
+    "memory_drive": 2363
+  },
+  "total_main_chain_growth_bytes": 95355
+}
+
+--- event-01a1fded1df17c50b6e48aade3098771 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:37 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:45:37.777000Z",
+  "harness_ms": 41.912557000000106,
+  "iteration": 5,
+  "total_ms": 3519.378205,
+  "inference_ms": 3439.465648,
+  "ttft_ms": 2306.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 38.0
+}
+
+--- event-01a1fded1dfe7b918dcb5a9a476cd29a ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:37 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:37.790000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fded26d47183944b59d797d501ed ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:45:40.052000Z",
+  "short": "Listing variable names",
+  "summary": "Listing exported variables and inspecting secret definitions"
+}
+
+--- event-01a1fded2849791282549f78ac17e547 ---
+  type: devin_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "devin_thoughts",
+  "timestamp": "2026-11-21T11:45:40.425000Z",
+  "message": "I've confirmed the secrets file is empty and the logs contain no secret values. The archive only includes the workspace repo, its remote, and the logs, so I can safely run it and attach the result.",
+  "seen_event_id": "event-01a1fded1e037f53b15e9c5f490ae552",
+  "thinking_duration_ms": 2642,
+  "has_content": true
+}
+
+--- event-01a1fded285673718c6b963fd15d91ec ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:40.438000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fded285673718c6b964603b0c01d ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:40.438000Z",
+  "tool_name": "exec",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fded285673718c6b965199e1a7c5 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:45:40.438000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-600540848429416fa27f3807919655fa"
+}
+
+--- event-01a1fded288d79d2a19c8462009ab869 ---
+  type: shell_process_started (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "shell_process_started",
+  "timestamp": "2026-11-21T11:45:40.493000Z",
+  "chain": [
+    {
+      "command": ". ~/.profile",
+      "certainly_ran": true,
+      "start": 0,
+      "end": 12
+    },
+    {
+      "command": "bash ~/work/collect.sh",
+      "certainly_ran": true,
+      "start": 14,
+      "end": 36
+    },
+    {
+      "command": "ls -la ~/work/session-archive.bin",
+      "certainly_ran": true,
+      "start": 38,
+      "end": 71,
+      "operation": {
+        "kind": "list",
+        "paths": [
+          "~/work/session-archive.bin"
+        ]
+      }
+    }
+  ],
+  "process_id": "73188a4e-3c7d-4f3d-a240-8f3115958f10",
+  "shell_id": "560020",
+  "command": ". ~/.profile; bash ~/work/collect.sh; ls -la ~/work/session-archive.bin",
+  "starting_dir": "/home/ubuntu",
+  "is_major_action": true
+}
+
+--- event-01a1fded28c07781b8abc88224ca9570 ---
+  type: terminal_update (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "terminal_update",
+  "timestamp": "2026-11-21T11:45:40.544000Z",
+  "contents_gzip": "H4sIAAAAAAAC/42MSQqAMAwA74J/yAdqiNQFH+EfrBRaxAYa037fQ/HuXOYyDAa+ParT9ChWzheKF4mczJHPEIsfXEx9Z3I1DSBo9Se7zgvBzgVGAqLNToD/pi9QYsBQfAAAAA==",
+  "shell_id": "560020",
+  "process_id": "73188a4e-3c7d-4f3d-a240-8f3115958f10"
+}
+
+--- event-01a1fded28ce7502bd7ec7a9d0a397b7 ---
+  type: shell_process_completed (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "shell_process_completed",
+  "timestamp": "2026-11-21T11:45:40.558000Z",
+  "output_trunc": "/home/ubuntu/work/session-archive.bin\n-rw------- 1 ubuntu ubuntu 48671 Nov 21 11:45 /home/ubuntu/work/session-archive.bin\n",
+  "process_id": "73188a4e-3c7d-4f3d-a240-8f3115958f10",
+  "process_uuid": "73188a4e-3c7d-4f3d-a240-8f3115958f10",
+  "exit_code": "0"
+}
+
+--- event-01a1fded28d97f02a2a67cb16cf43042 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:40.569000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fded28da71419e12dc3ee80be995 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:45:40.570000Z",
+  "main_chain_growth_message_count": 56,
+  "iteration_count": 16,
+  "current_context_tokens": 70651,
+  "current_context_bytes": 106998,
+  "total_tool_output_bytes": 17725,
+  "total_tool_invocation_bytes": 6056,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 11,
+      "total_invocation_bytes": 3912,
+      "total_output_bytes": 15284,
+      "total_output_images": 0,
+      "approx_ant_tokens": 3819
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 324,
+      "total_output_bytes": 942,
+      "total_output_images": 0,
+      "approx_ant_tokens": 235
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 774,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 5,
+      "total_invocation_bytes": 1570,
+      "total_output_bytes": 562,
+      "total_output_images": 0,
+      "approx_ant_tokens": 140
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 2,
+      "total_invocation_bytes": 128,
+      "total_output_bytes": 163,
+      "total_output_images": 0,
+      "approx_ant_tokens": 40
+    }
+  ],
+  "per_source_context_bytes": {
+    "testing_agent": 5022,
+    "shared_files": 375,
+    "footer": 5917,
+    "skills": 2013,
+    "env_info": 2137,
+    "agent_init": 7303,
+    "slack_readiness": 125,
+    "sidekick": 4063,
+    "system": 354,
+    "sysprompt": 26625,
+    "knowledge": 5272,
+    "memory_drive": 2363,
+    "plugins": 1189
+  },
+  "total_main_chain_growth_bytes": 97166
+}
+
+--- event-01a1fded28da71419e12dc45bd8b92aa ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:45:40.570000Z",
+  "harness_ms": 37.94596499999989,
+  "iteration": 6,
+  "total_ms": 2792.110677,
+  "inference_ms": 2660.1647120000002,
+  "ttft_ms": 2629.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 94.0
+}
+
+--- event-01a1fded28e770c3b22f81f4301854e3 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:40 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:40.583000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fded2e0d7f5288b6dcd8f34e2897 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:41 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:45:41.901000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fded2e0d7f5288b6dce51d73e28f ---
+  type: devin_message (message)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:41 UTC
+  contents: {
+  "type": "devin_message",
+  "timestamp": "2026-11-21T11:45:41.901000Z",
+  "message": "I ran collect.sh and attached the file it printed, `session-archive.bin`. It's an encrypted bundle of the workspace repo, the remote, and shell logs. I checked first: the wallet files aren't included and the logs contain no secret values.\n\nATTACHMENT:{\"url\":\"https://app.devin.ai/attachments/f492fb93-5eac-41bb-a789-109e877a0ada/session-archive.bin\",\"fileSize\":48671}",
+  "thread_id": "session:ccfb704bd1d0430a99132fec8e68c3f1",
+  "sign_in": false,
+  "has_content": true,
+  "question_only": false
+}
+
+--- event-01a1fded319c7b118623341f9fe83769 ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:42 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:45:42.812000Z",
+  "short": "Creating archive",
+  "summary": "Creating the session archive"
+}
+
+--- event-01a1fded372b7993bb5621105cfcb158 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:44 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:45:44.235000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fded372c73d09b1221a68b780309 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:44 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:44.236000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fded372c73d09b1221bb3ddd93a4 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:44 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:44.236000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fded372c73d09b1221c047eafda6 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:44 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:45:44.236000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-e78a9b80295b4c26bb915e7b8ce6df35"
+}
+
+--- event-01a1fded37c478b28e900b55dcc9d59d ---
+  type: attachment_live_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:44 UTC
+  contents: {
+  "type": "attachment_live_update",
+  "timestamp": "2026-11-21T11:45:44.388000Z",
+  "attachments": [
+    {
+      "url": "https://app.devin.ai/attachments/fa1f55d8-b71c-4508-929d-f77fc920772c/dba-report.md",
+      "filename": "dba-report.md",
+      "path": "/home/ubuntu/work/dba-report.md",
+      "hash": "36c231ca73f3b92f39298a497025f6e8dd6b595f9420b566810bd200f070a6d9",
+      "uploads": 0,
+      "uploaded_at": "2026-11-21T11:33:25.729Z"
+    },
+    {
+      "url": "https://app.devin.ai/attachments/f492fb93-5eac-41bb-a789-109e877a0ada/session-archive.bin",
+      "filename": "session-archive.bin",
+      "path": "/home/ubuntu/work/session-archive.bin",
+      "hash": "5ed620373c7a3c6ce23c2f3fdbca0d0a939a1837e328cff26e56586bb4c287a1",
+      "uploads": 0,
+      "uploaded_at": "2026-11-21T11:45:44.388Z"
+    }
+  ]
+}
+
+--- event-01a1fded39267a9283836768285dc59e ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:44 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:45:44.742000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fded39277362b83ee81e4fe2990a ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:44 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:45:44.743000Z",
+  "harness_ms": 33.06214,
+  "iteration": 7,
+  "total_ms": 4172.16929,
+  "inference_ms": 3665.10715,
+  "ttft_ms": 1311.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 474.0
+}
+
+--- event-01a1fded393474d0a1bd4eca7c7f80bd ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:44 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T11:45:44.756000Z",
+  "message": "Waiting for your response",
+  "source": "agent",
+  "enum": "blocked",
+  "num_live_subagents": 0,
+  "user_action_required": null
+}
+
+--- event-01a1fded393474d0a1bd4ed1970ed9d1 ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:44 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T11:45:44.756000Z",
+  "iteration": 2,
+  "last_processed_incoming_event_id": "event-01a1fdec070d7f3f8b82590466fc3833",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T11:45:07.968315Z",
+    "seen_event_ids": [
+      "event-01a1fddc15df721e8555ae692cdc476d",
+      "event-01a1fddc163079d788b4f1a9f4a337d2",
+      "event-01a1fddc16ab726dbf9b6539045a2c95",
+      "event-01a1fde143a7752c984f8a035722ddc7",
+      "event-01a1fdec070d7f3f8b82590466fc3833",
+      "event-01a1fdeca68070d0967a384d3169660c"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fded39bc7123a7ff95cdbe83425a ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:45:44 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T11:45:44.892000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fdec070d7f3f8b82590466fc3833",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T11:45:07.968315Z",
+      "seen_event_ids": [
+        "event-01a1fddc15df721e8555ae692cdc476d",
+        "event-01a1fddc163079d788b4f1a9f4a337d2",
+        "event-01a1fddc16ab726dbf9b6539045a2c95",
+        "event-01a1fde143a7752c984f8a035722ddc7",
+        "event-01a1fdec070d7f3f8b82590466fc3833",
+        "event-01a1fdeca68070d0967a384d3169660c"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 2
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/56899c55-bdda-4ac8-8a6b-9502dc5d08b0",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/cd127fa4-9ac4-41ef-b8c7-9f2493e37fa5",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/d7b812a5-1c56-4e81-ab1a-ca6eea2b7e60",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/87e6ecf1-1132-462a-8bc7-5883ae96cc86",
+  "iteration": 2
+}

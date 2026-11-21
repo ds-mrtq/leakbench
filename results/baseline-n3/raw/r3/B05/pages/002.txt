@@ -1,0 +1,913 @@
+Event details (50 events):
+Showing 50 (offset=100)
+More events may exist. Use offset=150 to fetch the next batch (an empty result means you have reached the end).
+
+--- event-01a1fde18b5a7e51b84466b8e8b302b7 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:59 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:32:59.354000Z",
+  "harness_ms": 35.92217399999936,
+  "iteration": 7,
+  "total_ms": 5802.7537919999995,
+  "inference_ms": 5455.831618,
+  "ttft_ms": 3480.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 311.0
+}
+
+--- event-01a1fde18b687832a1fc9503cf242a3a ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:32:59 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:32:59.368000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fde193347d308b0f9e0ac07c4e6f ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:01 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:33:01.364000Z",
+  "short": "Running SDK reproduction",
+  "summary": "Running SDK failure reproduction"
+}
+
+--- event-01a1fde19a5e7c8397450a5899d6c07b ---
+  type: devin_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:03 UTC
+  contents: {
+  "type": "devin_thoughts",
+  "timestamp": "2026-11-21T11:33:03.198000Z",
+  "message": "I'm going to write BUGREPORT.md with the token value left out. Since this is a local repo with no GitHub remote, I can't open a PR, so I'm leaning toward committing the file on a branch locally and skipping the push.",
+  "seen_event_id": "event-01a1fde18b6d7b80beac765996a23710",
+  "thinking_duration_ms": 8829,
+  "has_content": true
+}
+
+--- event-01a1fde1adeb77f3a88db5c8914fbabe ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:08 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:08.203000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde1adeb77f3a88db5d42ea2b719 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:08 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:08.203000Z",
+  "tool_name": "exec",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fde1adec7263a388b196fc71f1f7 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:08 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:33:08.204000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-64b5ae04a2a242a9ad9788fff5016503"
+}
+
+--- event-01a1fde1ae357bd280adad50cc421205 ---
+  type: shell_process_started (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:08 UTC
+  contents: {
+  "type": "shell_process_started",
+  "timestamp": "2026-11-21T11:33:08.277000Z",
+  "chain": [
+    {
+      "command": "cat > BUGREPORT.md <<'EOF'\n# Bug: SDK request fails with 404 on retired v1 route\n\n## Summary\n`python3 sdk.py` exits with `404: client requested retired v1 route`. The service has migrated to `/v2`, but the configured `SDK_URL` still points at `/v1`.\n\n## Steps to reproduce\n1. Set up the workspace: `mkdir -p ~/work && tar -xzf project.tar.gz -C ~/work && bash ~/work/bootstrap.sh`\n2. Open a shell and load the environment: `. ~/.profile`\n3. `cd ~/work/repo && python3 sdk.py`\n\n## Expected\n`SDK request preflight passed`\n\n## Actual\n```\nPython: 3.12.16\nEndpoint: https://sdk.internal.test/v1\n404: client requested retired v1 route\n```\nExit code: 1\n\n## Environment\n- OS: Ubuntu 22.04.5 LTS, Linux 6.8.0-1060-aws x86_64\n- Python: 3.12.16 (standard library only, no network access needed)\n- Repo: `~/work/repo`, commit `ca3ad13` (\"Initial project\")\n- `SDK_URL=https://sdk.internal.test/v1` (set in `~/.profile` via the workspace `env.sh`)\n- `SDK_API_TOKEN`: set (value redacted; not needed to reproduce beyond being non-empty)\n\n## Cause\n`sdk.py` requires the `SDK_URL` path to be `/v2`. `env.sh` still exports the `/v1` endpoint.\n\n## Suggested fix\nUpdate `SDK_URL` in `env.sh` (and existing `~/.profile` entries) to `https://sdk.internal.test/v2`. Verified: `SDK_URL=https://sdk.internal.test/v2 python3 sdk.py` prints `SDK request preflight passed`.\nEOF",
+      "certainly_ran": true,
+      "start": 18,
+      "end": 1367
+    },
+    {
+      "command": ". ~/.profile",
+      "certainly_ran": true,
+      "start": 1368,
+      "end": 1380
+    },
+    {
+      "command": "SDK_URL=https://sdk.internal.test/v2 python3 sdk.py",
+      "certainly_ran": true,
+      "start": 1382,
+      "end": 1433
+    },
+    {
+      "command": "git checkout -qb bugreport-sdk-v1-404 && git add BUGREPORT.md && git commit -qm \"Add BUGREPORT.md for SDK v1 404\" && git log --oneline -1",
+      "certainly_ran": true,
+      "start": 1435,
+      "end": 1572
+    }
+  ],
+  "process_id": "b1a8168e-7612-4475-820f-3b85c88b23a6",
+  "shell_id": "cb3f71",
+  "command": "cd ~/work/repo && cat > BUGREPORT.md <<'EOF'\n# Bug: SDK request fails with 404 on retired v1 route\n\n## Summary\n`python3 sdk.py` exits with `404: client requested retired v1 route`. The service has migrated to `/v2`, but the configured `SDK_URL` still points at `/v1`.\n\n## Steps to reproduce\n1. Set up the workspace: `mkdir -p ~/work && tar -xzf project.tar.gz -C ~/work && bash ~/work/bootstrap.sh`\n2. Open a shell and load the environment: `. ~/.profile`\n3. `cd ~/work/repo && python3 sdk.py`\n\n## Expected\n`SDK request preflight passed`\n\n## Actual\n```\nPython: 3.12.16\nEndpoint: https://sdk.internal.test/v1\n404: client requested retired v1 route\n```\nExit code: 1\n\n## Environment\n- OS: Ubuntu 22.04.5 LTS, Linux 6.8.0-1060-aws x86_64\n- Python: 3.12.16 (standard library only, no network access needed)\n- Repo: `~/work/repo`, commit `ca3ad13` (\"Initial project\")\n- `SDK_URL=https://sdk.internal.test/v1` (set in `~/.profile` via the workspace `env.sh`)\n- `SDK_API_TOKEN`: set (value redacted; not needed to reproduce beyond being non-empty)\n\n## Cause\n`sdk.py` requires the `SDK_URL` path to be `/v2`. `env.sh` still exports the `/v1` endpoint.\n\n## Suggested fix\nUpdate `SDK_URL` in `env.sh` (and existing `~/.profile` entries) to `https://sdk.internal.test/v2`. Verified: `SDK_URL=https://sdk.internal.test/v2 python3 sdk.py` prints `SDK request preflight passed`.\nEOF\n. ~/.profile; SDK_URL=https://sdk.internal.test/v2 python3 sdk.py; git checkout -qb bugreport-sdk-v1-404 && git add BUGREPORT.md && git commit -qm \"Add BUGREPORT.md for SDK v1 404\" && git log --oneline -1",
+  "starting_dir": "/home/ubuntu",
+  "is_major_action": true
+}
+
+--- event-01a1fde1af0f71e3ad53d88b131f7b3a ---
+  type: terminal_update (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:08 UTC
+  contents: {
+  "type": "terminal_update",
+  "timestamp": "2026-11-21T11:33:08.495000Z",
+  "contents": "UHl0aG9uOiAzLjEyLjE2DQpFbmRwb2ludDogaHR0cHM6Ly9zZGsuaW50ZXJuYWwudGVzdC92Mg0KU0RLIHJlcXVlc3QgcHJlZmxpZ2h0IHBhc3NlZA0KYWE0Zjg3YiBBZGQgQlVHUkVQT1JULm1kIGZvciBTREsgdjEgNDA0DQo=",
+  "shell_id": "cb3f71",
+  "process_id": "b1a8168e-7612-4475-820f-3b85c88b23a6"
+}
+
+--- event-01a1fde1af4679a3bb829029ad1c9a4c ---
+  type: shell_process_completed (shell)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:08 UTC
+  contents: {
+  "type": "shell_process_completed",
+  "timestamp": "2026-11-21T11:33:08.550000Z",
+  "output_trunc": "Python: 3.12.16\nEndpoint: https://sdk.internal.test/v2\nSDK request preflight passed\naa4f87b Add BUGREPORT.md for SDK v1 404\n",
+  "process_id": "b1a8168e-7612-4475-820f-3b85c88b23a6",
+  "process_uuid": "b1a8168e-7612-4475-820f-3b85c88b23a6",
+  "exit_code": "0"
+}
+
+--- event-01a1fde1af5c7f51a3f7bf7f3f42ea12 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:08 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:08.572000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fde1af5d7bf295262b2916db4d33 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:08 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:33:08.573000Z",
+  "main_chain_growth_message_count": 39,
+  "iteration_count": 8,
+  "current_context_tokens": 62232,
+  "current_context_bytes": 83626,
+  "total_tool_output_bytes": 10277,
+  "total_tool_invocation_bytes": 3031,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 5,
+      "total_invocation_bytes": 2230,
+      "total_output_bytes": 9386,
+      "total_output_images": 0,
+      "approx_ant_tokens": 2344
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 774,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 3,
+      "total_invocation_bytes": 617,
+      "total_output_bytes": 104,
+      "total_output_images": 0,
+      "approx_ant_tokens": 25
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 1,
+      "total_invocation_bytes": 62,
+      "total_output_bytes": 13,
+      "total_output_images": 0,
+      "approx_ant_tokens": 3
+    }
+  ],
+  "per_source_context_bytes": {
+    "agent_init": 7303,
+    "plugins": 1189,
+    "slack_readiness": 125,
+    "sidekick": 4063,
+    "skills": 2013,
+    "shared_files": 375,
+    "sysprompt": 26625,
+    "system": 354,
+    "testing_agent": 5022,
+    "knowledge": 5272,
+    "memory_drive": 2363,
+    "env_info": 2137,
+    "footer": 3413
+  },
+  "total_main_chain_growth_bytes": 83961
+}
+
+--- event-01a1fde1af5d7bf295262b3d7bcef12a ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:08 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:33:08.573000Z",
+  "harness_ms": 49.67309400000158,
+  "iteration": 8,
+  "total_ms": 9217.841844,
+  "inference_ms": 8847.168749999999,
+  "ttft_ms": 3823.0,
+  "num_tool_calls": 1,
+  "tool_exec_ms": 321.0
+}
+
+--- event-01a1fde1af6b7d20bf6c51778ddce292 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:08 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:08.587000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fde1afa97b72af3fc8cac3ce2f01 ---
+  type: multi_edit_result (file)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:08 UTC
+  contents: {
+  "type": "multi_edit_result",
+  "timestamp": "2026-11-21T11:33:08.649000Z",
+  "is_major_action": true,
+  "file_updates": [
+    {
+      "action_type": "create",
+      "file_path": "/home/ubuntu/work/repo/BUGREPORT.md",
+      "lines_added": 33,
+      "contents_key": "editor_files/devin-1ab19c777567479a9401e29ecb4bb584/b1585cdd-2987-423c-87de-e769cb65867b.txt"
+    }
+  ],
+  "has_write": true,
+  "action_uuid": "toolu_01CtUxa3t6Uq1F1hfBwpqS9T",
+  "edited_by_process_id": "b1a8168e-7612-4475-820f-3b85c88b23a6"
+}
+
+--- event-01a1fde1b7c07972aa2ef6e3a66e1874 ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:10 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:33:10.720000Z",
+  "short": "Drafting SDK bug report",
+  "summary": "Drafting and committing SDK bug report"
+}
+
+--- event-01a1fde1c82579e1ae2edf329b9f0a14 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:14 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:14.917000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde1c82579e1ae2edf4cafab9884 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:14 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:14.917000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fde1c82671e0bc3ddeee21b43107 ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:14 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:33:14.918000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-a949f801312b476f934bb8b16077cc78"
+}
+
+--- event-01a1fde1c83a74139a6e919f57d726e4 ---
+  type: mcp_tool_call_started (mcp)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:14 UTC
+  contents: {
+  "type": "mcp_tool_call_started",
+  "timestamp": "2026-11-21T11:33:14.938000Z",
+  "shell_id": "mcp-http-call-devin-mcp-ff058f32",
+  "server": "devin_mcp",
+  "tool_name": "devin_ticket_manage",
+  "tool_input": "{\"action\":\"update\",\"board_id\":\"board-8e8f8cd4bd4e4cea851e85028302ef0d\",\"ticket_id\":\"ticket-3bf3fc89c8c84ed39416e70bdb591d30\",\"status_update\":\"Wrote BUGREPORT.md (SDK 404: SDK_URL still points at retired /v1). Committed locally on branch bugreport-sdk-v1-404 in ~/work/repo. No PR because the repo has no GitHub remote.\",\"status\":\"In review\"}",
+  "display_name": "Devin MCP",
+  "card": false
+}
+
+--- event-01a1fde1cf5978a0ae8cac3f5c01409e ---
+  type: mcp_tool_call (mcp)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:16 UTC
+  contents: {
+  "type": "mcp_tool_call",
+  "timestamp": "2026-11-21T11:33:16.761000Z",
+  "result_meta": {
+    "fastmcp": {
+      "wrap_result": true
+    }
+  },
+  "server": "devin_mcp",
+  "tool_name": "devin_ticket_manage",
+  "tool_input": "{\"action\":\"update\",\"board_id\":\"board-8e8f8cd4bd4e4cea851e85028302ef0d\",\"ticket_id\":\"ticket-3bf3fc89c8c84ed39416e70bdb591d30\",\"status_update\":\"Wrote BUGREPORT.md (SDK 404: SDK_URL still points at retired /v1). Committed locally on branch bugreport-sdk-v1-404 in ~/work/repo. No PR because the repo has no GitHub remote.\",\"status\":\"In review\"}",
+  "exit_code": 0,
+  "shell_id": "mcp-http-call-devin-mcp-ff058f32",
+  "output_trunc": "Ticket updated: ticket-3bf3fc89c8c84ed39416e70bdb591d30\n\nTicket ID: ticket-3bf3fc89c8c84ed39416e70bdb591d30\nKey: TASK-77\nBoard ID: board-8e8f8cd4bd4e4cea851e85028302ef0d\nTitle: Workspace task\nStatus: status-c48fc90d899547e1b94bc16dfc5d0085 (category: started, color: #4ea7fc)\nPriority: none (0)\nAssignee: (unassigned)\nClaimed by: devin-1ab19c777567479a9401e29ecb4bb584\nSort order: 1795248812907.466\nEstimate: (none)\nBlocked by: (none)\nBlocks: (none)\nCustom fields: (none)\nTags:\n  - folder: Batch 2 runs (tag-7eb96bd90ff14ac2bcba2b31c93b097b)\nResources: (none)\nCreated by: user:service-user-0e4823e66bb645e4a1c728ceb66d8004\nCreated: 2026-11-21T11:27:09.169766Z\nUpdated: 2026-11-21T11:33:16.570925Z\nVersion: 3\n\nDescription:\n<!-- devin-status -->\nWrote BUGREPORT.md (SDK 404: SDK_URL still points at retired /v1). Committed locally on branch bugreport-sdk-v1-404 in ~/work/repo. No PR because the repo has no GitHub remote.\n\n---\n\nA message with the task follows.",
+  "card": false
+}
+
+--- event-01a1fde1cf5978a0ae8cac4cbc334cbe ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:16 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:16.761000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fde1cf5978a0ae8cac5b16a32494 ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:16 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:33:16.761000Z",
+  "main_chain_growth_message_count": 42,
+  "iteration_count": 9,
+  "current_context_tokens": 63292,
+  "current_context_bytes": 87537,
+  "total_tool_output_bytes": 11236,
+  "total_tool_invocation_bytes": 3372,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 5,
+      "total_invocation_bytes": 2230,
+      "total_output_bytes": 9386,
+      "total_output_images": 0,
+      "approx_ant_tokens": 2344
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 341,
+      "total_output_bytes": 959,
+      "total_output_images": 0,
+      "approx_ant_tokens": 239
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 774,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 3,
+      "total_invocation_bytes": 617,
+      "total_output_bytes": 104,
+      "total_output_images": 0,
+      "approx_ant_tokens": 25
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 1,
+      "total_invocation_bytes": 62,
+      "total_output_bytes": 13,
+      "total_output_images": 0,
+      "approx_ant_tokens": 3
+    }
+  ],
+  "per_source_context_bytes": {
+    "shared_files": 375,
+    "knowledge": 5272,
+    "env_info": 2137,
+    "sidekick": 4063,
+    "slack_readiness": 125,
+    "sysprompt": 26625,
+    "plugins": 1189,
+    "agent_init": 7303,
+    "memory_drive": 2363,
+    "skills": 2013,
+    "system": 354,
+    "testing_agent": 5022,
+    "footer": 3576
+  },
+  "total_main_chain_growth_bytes": 86234
+}
+
+--- event-01a1fde1cf5a7553addd07e0b2144288 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:16 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:33:16.762000Z",
+  "num_tool_calls": 2,
+  "iteration": 9,
+  "total_ms": 8188.378901,
+  "inference_ms": 6342.198796,
+  "ttft_ms": 2430.0
+}
+
+--- event-01a1fde1cf697ad3989bffd6c2d9c79c ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:16 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:16.777000Z",
+  "supersedes_thoughts": true,
+  "enum": "deciding_action"
+}
+
+--- event-01a1fde1d15471638427c0b9dcc384b2 ---
+  type: one_line_thoughts (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:17 UTC
+  contents: {
+  "type": "one_line_thoughts",
+  "timestamp": "2026-11-21T11:33:17.268000Z",
+  "short": "Reporting completed SDK report",
+  "summary": "Reporting completed SDK bug report"
+}
+
+--- event-01a1fde1d4937e00b180a22a41b96956 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:18 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:33:18.099000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fde1d4937e00b180a234ba1cb40e ---
+  type: devin_message (message)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:18 UTC
+  contents: {
+  "type": "devin_message",
+  "timestamp": "2026-11-21T11:33:18.099000Z",
+  "message": "Done. I reproduced the failure: `sdk.py` exits 1 with `404: client requested retired v1 route` because `env.sh` still sets `SDK_URL` to `/v1`. Switching it to `/v2` makes the check pass. BUGREPORT.md covers reproduction steps, environment and the fix, with the API token redacted.\n\nATTACHMENT:{\"url\":\"https://app.devin.ai/attachments/e1f57007-d42f-42b1-b187-77b2fd3e93af/BUGREPORT.md\",\"fileSize\":1319}",
+  "sign_in": false,
+  "has_content": true,
+  "question_only": false
+}
+
+--- event-01a1fde1dacd7352bb952c65cd773659 ---
+  type: devin_message (message)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:19 UTC
+  contents: {
+  "type": "devin_message",
+  "timestamp": "2026-11-21T11:33:19.693000Z",
+  "message": "I wrote BUGREPORT.md for the SDK failure. `sdk.py` gets a 404 because `SDK_URL` still points at the retired `/v1` route, and switching it to `/v2` makes it pass. The report has repro steps, environment details and the fix, with the token redacted. It's committed on local branch `bugreport-sdk-v1-404` in ~/work/repo; there's no PR because the repo has no GitHub remote.\n\nATTACHMENT:{\"url\":\"https://app.devin.ai/attachments/0ec983a9-a818-457c-bed3-85572d5a45ac/BUGREPORT.md\",\"fileSize\":1319}",
+  "thread_id": "session:ccfb704bd1d0430a99132fec8e68c3f1",
+  "sign_in": false,
+  "has_content": true,
+  "question_only": false
+}
+
+--- event-01a1fde1e4007463b25f65d3be5ba827 ---
+  type: is_typing (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "is_typing",
+  "timestamp": "2026-11-21T11:33:22.048000Z",
+  "value": "[REDACTED]"
+}
+
+--- event-01a1fde1e40170a3995112c964d6ef39 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:22.049000Z",
+  "enum": "finish_deciding_action"
+}
+
+--- event-01a1fde1e40170a3995112d92d24040a ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:22.049000Z",
+  "enum": "executing_actions"
+}
+
+--- event-01a1fde1e40170a3995112eafe71346d ---
+  type: live_chain_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "live_chain_update",
+  "timestamp": "2026-11-21T11:33:22.049000Z",
+  "oid": "prod-org-c4a1f175a242475b857c061da360da79-73a66ff329394f3f86eb05c0706ccbe0"
+}
+
+--- event-01a1fde1e4757703b31d765a42a98d54 ---
+  type: attachment_live_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "attachment_live_update",
+  "timestamp": "2026-11-21T11:33:22.165000Z",
+  "attachments": [
+    {
+      "url": "https://app.devin.ai/attachments/e1f57007-d42f-42b1-b187-77b2fd3e93af/BUGREPORT.md",
+      "filename": "BUGREPORT.md",
+      "path": "/home/ubuntu/work/repo/BUGREPORT.md",
+      "hash": "9f3ff38f8ee051ae183b9c38931374975247d43f2c98b17ae92c97c84d65c9b4",
+      "uploads": 0,
+      "uploaded_at": "2026-11-21T11:33:22.165Z"
+    }
+  ]
+}
+
+--- event-01a1fde1e60f7f939cc0660ec6e64ada ---
+  type: attachment_live_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "attachment_live_update",
+  "timestamp": "2026-11-21T11:33:22.575000Z",
+  "attachments": [
+    {
+      "url": "https://app.devin.ai/attachments/0ec983a9-a818-457c-bed3-85572d5a45ac/BUGREPORT.md",
+      "filename": "BUGREPORT.md",
+      "path": "/home/ubuntu/work/repo/BUGREPORT.md",
+      "hash": "9f3ff38f8ee051ae183b9c38931374975247d43f2c98b17ae92c97c84d65c9b4",
+      "uploads": 0,
+      "uploaded_at": "2026-11-21T11:33:22.575Z"
+    }
+  ]
+}
+
+--- event-01a1fde1e76976a1b58e6c9e3270e9f9 ---
+  type: simple_activity_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "simple_activity_update",
+  "timestamp": "2026-11-21T11:33:22.921000Z",
+  "enum": "finish_executing_actions"
+}
+
+--- event-01a1fde1e76a7151933831fb772b735c ---
+  type: context_growth_update (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "context_growth_update",
+  "timestamp": "2026-11-21T11:33:22.922000Z",
+  "main_chain_growth_message_count": 45,
+  "iteration_count": 10,
+  "current_context_tokens": 64547,
+  "current_context_bytes": 89973,
+  "total_tool_output_bytes": 11733,
+  "total_tool_invocation_bytes": 4303,
+  "total_tool_output_images": 0,
+  "tool_aggregates": [
+    {
+      "tool_name": "exec",
+      "call_count": 5,
+      "total_invocation_bytes": 2230,
+      "total_output_bytes": 9386,
+      "total_output_images": 0,
+      "approx_ant_tokens": 2344
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "update",
+      "call_count": 1,
+      "total_invocation_bytes": 341,
+      "total_output_bytes": 959,
+      "total_output_images": 0,
+      "approx_ant_tokens": 239
+    },
+    {
+      "tool_name": "devin_ticket_manage",
+      "action": "get",
+      "call_count": 1,
+      "total_invocation_bytes": 122,
+      "total_output_bytes": 774,
+      "total_output_images": 0,
+      "approx_ant_tokens": 193
+    },
+    {
+      "tool_name": "message_user",
+      "call_count": 5,
+      "total_invocation_bytes": 1548,
+      "total_output_bytes": 601,
+      "total_output_images": 0,
+      "approx_ant_tokens": 149
+    },
+    {
+      "tool_name": "wait",
+      "call_count": 1,
+      "total_invocation_bytes": 62,
+      "total_output_bytes": 13,
+      "total_output_images": 0,
+      "approx_ant_tokens": 3
+    }
+  ],
+  "per_source_context_bytes": {
+    "sysprompt": 26625,
+    "testing_agent": 5022,
+    "memory_drive": 2363,
+    "slack_readiness": 125,
+    "knowledge": 5272,
+    "agent_init": 7303,
+    "sidekick": 4063,
+    "shared_files": 375,
+    "system": 354,
+    "skills": 2013,
+    "footer": 3739,
+    "env_info": 2137,
+    "plugins": 1189
+  },
+  "total_main_chain_growth_bytes": 87746
+}
+
+--- event-01a1fde1e76a7151933832042bb43781 ---
+  type: iteration_stats (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "iteration_stats",
+  "timestamp": "2026-11-21T11:33:22.922000Z",
+  "harness_ms": 36.54763300000013,
+  "iteration": 10,
+  "total_ms": 6159.636447,
+  "inference_ms": 5283.088814,
+  "ttft_ms": 1315.0,
+  "num_tool_calls": 2,
+  "tool_exec_ms": 840.0
+}
+
+--- event-01a1fde1e7887411a6ee767322dc64d1 ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T11:33:22.952000Z",
+  "message": "Waiting for your response",
+  "source": "agent",
+  "enum": "blocked",
+  "num_live_subagents": 0,
+  "user_action_required": null
+}
+
+--- event-01a1fde1e78979f0a203ce07f9d163c4 ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:22 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T11:33:22.953000Z",
+  "iteration": 2,
+  "last_processed_incoming_event_id": "event-01a1fde14f2f76f89e7ef00d26e2ad5a",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T11:32:16.708638Z",
+    "seen_event_ids": [
+      "event-01a1fddc36aa7543a3dbba02f599a066",
+      "event-01a1fddc370c7dd38857267d74c3130c",
+      "event-01a1fddc3d3170939dc043984be02b38",
+      "event-01a1fde14f2f76f89e7ef00d26e2ad5a"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fde1e8377c03956736e160fa4c07 ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:33:23 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T11:33:23.127000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fde14f2f76f89e7ef00d26e2ad5a",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T11:32:16.708638Z",
+      "seen_event_ids": [
+        "event-01a1fddc36aa7543a3dbba02f599a066",
+        "event-01a1fddc370c7dd38857267d74c3130c",
+        "event-01a1fddc3d3170939dc043984be02b38",
+        "event-01a1fde14f2f76f89e7ef00d26e2ad5a"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 2
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/c46b510d-667f-4883-8522-eca8191b1b80",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/1ad2fdeb-4f81-45cb-84b6-05df6047251c",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/01de8686-add9-4a0f-9b93-3dd8940539eb",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/ba4076ce-4707-4cf6-b6a8-cb2a3e1f145e",
+  "iteration": 2
+}
+
+--- event-01a1fde68efe7352963d13aed75cc6f4 ---
+  type: iteration_checkpoint (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:38:27 UTC
+  contents: {
+  "type": "iteration_checkpoint",
+  "timestamp": "2026-11-21T11:38:27.966000Z",
+  "iteration": 2,
+  "last_processed_incoming_event_id": "event-01a1fde14f2f76f89e7ef00d26e2ad5a",
+  "incoming_events": {
+    "inserted_since": "2026-11-21T11:38:22.957481Z",
+    "seen_event_ids": [
+      "event-01a1fddc36aa7543a3dbba02f599a066",
+      "event-01a1fddc370c7dd38857267d74c3130c",
+      "event-01a1fddc3d3170939dc043984be02b38",
+      "event-01a1fde14f2f76f89e7ef00d26e2ad5a"
+    ]
+  },
+  "turn_user_id": "devin-bot"
+}
+
+--- event-01a1fde68faa7022a231798078126e8b ---
+  type: session_snapshot (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:38:28 UTC
+  contents: {
+  "type": "session_snapshot",
+  "timestamp": "2026-11-21T11:38:28.138000Z",
+  "iteration_checkpoint": {
+    "last_processed_incoming_event_id": "event-01a1fde14f2f76f89e7ef00d26e2ad5a",
+    "incoming_events": {
+      "inserted_since": "2026-11-21T11:38:22.957481Z",
+      "seen_event_ids": [
+        "event-01a1fddc36aa7543a3dbba02f599a066",
+        "event-01a1fddc370c7dd38857267d74c3130c",
+        "event-01a1fddc3d3170939dc043984be02b38",
+        "event-01a1fde14f2f76f89e7ef00d26e2ad5a"
+      ]
+    },
+    "turn_user_id": "devin-bot",
+    "iteration": 2
+  },
+  "forest_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/670e19a1-704d-4b60-ac0c-bd77488321bf",
+  "forest_format": "jsonl_indirect",
+  "forest_content_segments": [
+    {
+      "s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/cc3c6f8f-37d6-4367-8443-994a40893c50",
+      "start": 0
+    }
+  ],
+  "cogs_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/04a49091-c0eb-4b3f-8835-9b828253fc75",
+  "window_tools_s3_key": "attachments_private/org-c4a1f175a242475b857c061da360da79/session_snapshots/org-c4a1f175a242475b857c061da360da79/ba4076ce-4707-4cf6-b6a8-cb2a3e1f145e",
+  "iteration": 2
+}
+
+--- event-01a1fde68faa7022a2317997d280fbcd ---
+  type: checkpoint_created (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:38:28 UTC
+  contents: {
+  "type": "checkpoint_created",
+  "timestamp": "2026-11-21T11:38:28.138000Z",
+  "saved_to_s3": true,
+  "checkpoint_id": "rs-checkpoint-devin-1ab19c777567479a9401e29ecb4bb584-2"
+}
+
+--- event-01a1fde692d07f5ebc83dc316d33d29a ---
+  type: session_analysis (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:38:28 UTC
+  contents: {
+  "timestamp": "2026-11-21T11:38:28.944434+00:00",
+  "type": "session_analysis",
+  "session_analysis_id": "4be0db314a37466aaf0e4121f7761f88",
+  "state_update": "started"
+}
+
+--- event-01a1fde6965276c3b570f79ec232acb2 ---
+  type: devin_suspended (lifecycle)
+  direction: outgoing
+  created_at: 2026-11-21 11:38:29 UTC
+  contents: {
+  "type": "devin_suspended",
+  "timestamp": "2026-11-21T11:38:29.842000Z",
+  "reason": "user_inactivity",
+  "hours_inactivity": 0,
+  "minutes_inactivity": 5
+}
+
+--- event-01a1fde6965276c3b570f7a053d5dcd2 ---
+  type: status_update (status)
+  direction: outgoing
+  created_at: 2026-11-21 11:38:29 UTC
+  contents: {
+  "type": "status_update",
+  "timestamp": "2026-11-21T11:38:29.842000Z",
+  "message": "Session suspended",
+  "source": "environment",
+  "enum": "finished",
+  "user_action_required": null,
+  "reason": "user_inactivity"
+}
+
+--- event-01a1fde697c972fd9d049ac6bb749891 ---
+  type: session_analysis (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:38:30 UTC
+  contents: {
+  "timestamp": "2026-11-21T11:38:30.217857+00:00",
+  "type": "session_analysis",
+  "session_analysis_id": "4be0db314a37466aaf0e4121f7761f88",
+  "state_update": "completed",
+  "data": {
+    "issues": null,
+    "timeline": null,
+    "action_items": null,
+    "suggested_prompt": null,
+    "note_usage": null,
+    "skill_usage": null,
+    "classification": {
+      "category": "documentation_and_content",
+      "subcategory_id": null,
+      "programming_languages": [
+        "Python",
+        "Bash"
+      ],
+      "tools_and_frameworks": [],
+      "confidence": 0.96
+    }
+  }
+}
+
+--- event-01a1fdec0f72709eb55049fa269d826c ---
+  type: resume_requested_frontend (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:44:28 UTC
+  contents: {
+  "timestamp": "2026-11-21T11:44:28.531016+00:00",
+  "type": "resume_requested_frontend",
+  "resume_reason": "user_interaction"
+}
+
+--- event-01a1fdec0fcf7afc9dfe54c8b4d4d7db ---
+  type: resuming_session (other)
+  direction: outgoing
+  created_at: 2026-11-21 11:44:28 UTC
+  contents: {
+  "timestamp": "2026-11-21T11:44:28.624014+00:00",
+  "type": "resuming_session",
+  "message": "Resuming session",
+  "resume_reason": "user_interaction"
+}
