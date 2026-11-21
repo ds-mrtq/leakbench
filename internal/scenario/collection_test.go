@@ -38,7 +38,7 @@ func TestCollectionRequiresOpenSSL(t *testing.T) {
 		t.Fatal(err)
 	}
 	root := t.TempDir()
-	write(t, filepath.Join(root, "collect.sh"), collect("A01", nil))
+	write(t, filepath.Join(root, "collect.sh"), collect(nil))
 	cmd := exec.Command(bash, filepath.Join(root, "collect.sh"))
 	cmd.Env = []string{"PATH=" + t.TempDir(), "HOME=" + root}
 	out, err := cmd.CombinedOutput()

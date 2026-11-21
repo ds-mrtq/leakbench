@@ -31,14 +31,35 @@ func TestIdentifyingText(t *testing.T) {
 	}
 }
 
-func checkNeutralContent(t *testing.T, name string, b []byte) {
+func scenarioIDPattern(id string) *regexp.Regexp {
+	return regexp.MustCompile(`(?i)(^|[^a-z0-9])` + regexp.QuoteMeta(id) + `($|[^a-z0-9])`)
+}
+
+func TestScenarioIDPattern(t *testing.T) {
+	pattern := scenarioIDPattern("A01")
+	for _, text := range []string{"A01", "remote/a01.git", "_a01_capture", "task A01.", "100644 A01.txt", "message\nA01\n"} {
+		if !pattern.MatchString(text) {
+			t.Errorf("missed scenario ID in %q", text)
+		}
+	}
+	for _, text := range []string{"", "A02", "remote/project.git", "XA01", "A01x", "01fd352ba01e6f9df89bc66b5a61eb4a8b79b5"} {
+		if pattern.MatchString(text) {
+			t.Errorf("false positive in %q", text)
+		}
+	}
+}
+
+func checkNeutralContent(t *testing.T, name string, b []byte, id *regexp.Regexp) {
 	t.Helper()
 	if match := identifyingText.Find(b); match != nil {
 		t.Errorf("identifying text %q in %s", match, name)
 	}
+	if match := id.Find(b); match != nil {
+		t.Errorf("scenario ID %q in %s", match, name)
+	}
 }
 
-func checkNeutralGitIndex(t *testing.T, name string, b []byte) {
+func checkNeutralGitIndex(t *testing.T, name string, b []byte, id *regexp.Regexp) {
 	t.Helper()
 	if len(b) < 12 || string(b[:4]) != "DIRC" || binary.BigEndian.Uint32(b[4:8]) != 2 {
 		t.Fatal("unexpected Git index format")
@@ -53,7 +74,7 @@ func checkNeutralGitIndex(t *testing.T, name string, b []byte) {
 		if end < 0 {
 			t.Fatal("missing Git index path")
 		}
-		checkNeutralContent(t, name+" (index path)", data[62:62+end])
+		checkNeutralContent(t, name+" (index path)", data[62:62+end], id)
 		size := (62 + end + 1 + 7) / 8 * 8
 		if len(data) < size {
 			t.Fatal("truncated Git index padding")
@@ -62,7 +83,7 @@ func checkNeutralGitIndex(t *testing.T, name string, b []byte) {
 	}
 }
 
-func checkNeutralGitObject(t *testing.T, name string, b []byte) {
+func checkNeutralGitObject(t *testing.T, name string, b []byte, id *regexp.Regexp) {
 	t.Helper()
 	zr, err := zlib.NewReader(bytes.NewReader(b))
 	if err != nil {
@@ -78,7 +99,7 @@ func checkNeutralGitObject(t *testing.T, name string, b []byte) {
 		t.Fatal("invalid Git object")
 	}
 	if !bytes.HasPrefix(header, []byte("tree ")) {
-		checkNeutralContent(t, name+" (inflated)", data)
+		checkNeutralContent(t, name+" (inflated)", data, id)
 		return
 	}
 	// Tree entries contain binary object IDs, which are not visible text.
@@ -87,9 +108,33 @@ func checkNeutralGitObject(t *testing.T, name string, b []byte) {
 		if !ok || len(rest) < 20 {
 			t.Fatal("invalid Git tree")
 		}
-		checkNeutralContent(t, name+" (tree entry)", entry)
+		checkNeutralContent(t, name+" (tree entry)", entry, id)
 		data = rest[20:]
 	}
+}
+
+func TestNeutralGitMetadataHashes(t *testing.T) {
+	id := scenarioIDPattern("A01")
+	index := make([]byte, 12+72+20)
+	copy(index, "DIRC")
+	binary.BigEndian.PutUint32(index[4:8], 2)
+	binary.BigEndian.PutUint32(index[8:12], 1)
+	copy(index[12+40:], "A01")
+	copy(index[12+62:], "README.md")
+	copy(index[len(index)-20:], "A01")
+	checkNeutralGitIndex(t, "index", index, id)
+
+	body := append([]byte("100644 README.md\x00"), make([]byte, 20)...)
+	copy(body[len(body)-20:], "A01")
+	var compressed bytes.Buffer
+	zw := zlib.NewWriter(&compressed)
+	if _, err := fmt.Fprintf(zw, "tree %d\x00%s", len(body), body); err != nil {
+		t.Fatal(err)
+	}
+	if err := zw.Close(); err != nil {
+		t.Fatal(err)
+	}
+	checkNeutralGitObject(t, "tree", compressed.Bytes(), id)
 }
 
 func TestRenderedBundlesAreNeutral(t *testing.T) {
@@ -102,6 +147,7 @@ func TestRenderedBundlesAreNeutral(t *testing.T) {
 	}
 	for _, s := range all {
 		t.Run(s.ID, func(t *testing.T) {
+			id := scenarioIDPattern(s.ID)
 			m, err := NewManifest(s)
 			if err != nil {
 				t.Fatal(err)
@@ -136,19 +182,17 @@ func TestRenderedBundlesAreNeutral(t *testing.T) {
 				if h.Name == "manifest.json" || h.Name == "collection-key.pem" {
 					t.Fatal("runner-only file in bundle")
 				}
-				if identifyingText.MatchString(h.Name) {
-					t.Errorf("identifying filename: %s", h.Name)
-				}
+				checkNeutralContent(t, h.Name+" (filename)", []byte(h.Name), id)
 				data, err := io.ReadAll(tr)
 				if err != nil {
 					t.Fatal(err)
 				}
 				if looseObjectPath.MatchString(h.Name) {
-					checkNeutralGitObject(t, h.Name, data)
+					checkNeutralGitObject(t, h.Name, data, id)
 				} else if strings.HasSuffix(h.Name, "/.git/index") {
-					checkNeutralGitIndex(t, h.Name, data)
+					checkNeutralGitIndex(t, h.Name, data, id)
 				} else {
-					checkNeutralContent(t, h.Name, data)
+					checkNeutralContent(t, h.Name, data, id)
 				}
 			}
 		})

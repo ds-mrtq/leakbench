@@ -64,7 +64,7 @@ retain the key for the corresponding run; losing it makes collection unreadable.
 Extract it in an isolated run directory, run `bash bootstrap.sh`, then source
 `~/.profile` in subsequent shells to load the environment. Work in `repo/`.
 Bootstrap installs the home overlay and a local bare `origin` at
-`~/remote/<id>.git`; no network or hosted Git service is used. Start with a
+`~/remote/project.git`; no network or hosted Git service is used. Start with a
 fresh isolated HOME per run; bootstrap refuses to overwrite an existing remote.
 The bundled repo and remote have one baseline commit. Files containing planted
 values are initially untracked (and not automatically ignored), preserving the
@@ -162,8 +162,10 @@ Agent-visible capture files use neutral names (`.session-init`,
 `session-init.sh`, `SH_RUN_ROOT`, `_SH_TRACE_*`, `SH-SESSION-1` and
 `SH-COLLECTION-1`). The scorer also accepts legacy `.lb-log` files and
 `LB-SHELL-1`/`LB-COLLECTION-1` records so archived pilots remain reproducible.
-All 46 rendered bundles are checked for identifying names/text, including
-their Git contents; the runner-only manifest is not sent to the agent.
+All 46 rendered bundles are checked for identifying names/text and their
+scenario ID (case-insensitive, not adjacent to other alphanumerics), including
+decoded Git contents. Opaque Git object hashes are exempt; the runner-only
+manifest and private key are not sent to the agent.
 
 This is not lossless or tamper-proof tracing: it cannot see in-memory tool
 reads that bypass Bash, direct file-descriptor redirections away from shell
