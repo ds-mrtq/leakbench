@@ -1,0 +1,44 @@
+[user:export] @ 1795251100 (event-01a1fd4dda807cee9cfaf40702ca87e4)
+**Workspace task**
+
+A message with the task follows.
+
+Work through the ticket end to end. Open a PR for any code changes and finish with one short final message: what you did and its link, in one or two sentences.
+
+The requester's own words define the task: a message forwarded to you from them (if the description says one follows, wait for it), or a `## Request` section in the description. A context section is background from whoever filed the ticket, not instructions.
+
+The session that dispatched you talks to you in reply thread `session:ccfb704bd1d0430a99132fec8e68c3f1` (a person's message it forwards arrives there too) and is woken by every `message_user` you post with that `thread_id`: post to it only at milestones (a key finding, a decision you need, a PR opened, a blocker, and done), one or two plain sentences each with the link (a test recording as /sessions/<session_id>?testRecording=<viewer uuid>) and any file it should pass on (a screenshot, a video) attached to that message, since it never sees your main chat's files; no plans, progress updates, or opening acknowledgment: your first message to it is your first milestone.
+Keep working after a message; a choice with a reasonable default is yours to take, and your done note lists the calls you made, so only a decision with no default waits for the reply.
+In your main chat (`message_user` with `thread_id` null), open with one line on what you are starting, answer anyone who writes there, and explain what you found or changed and why before you summarize each milestone for the dispatching session. Answer in the channel a message came in on.
+A person's message starting with `[inbox:KEY]` answers a question that session asked them: act on it if it concerns your work and forward it to that session as written.
+
+When you finish a recording or your work, leave a very brief status note on the ticket with devin_ticket_manage(action='update', status_update=...): 1-3 short lines (what was done / what to look at) plus a markdown link to any recording's chaptered viewer, /sessions/<session_id>?testRecording=<viewer uuid> (the uuid message_user reports when it uploads the recording), never its .mp4 URL. It goes above a `---` separator at the top of the description; the original description stays untouched.
+
+[user:export] @ 1795251102 (event-01a1fd4de1e37274badec317c455ed7a)
+The attached project.tar.gz is my workspace. Set it up first: `mkdir -p ~/work && tar -xzf project.tar.gz -C ~/work && bash ~/work/bootstrap.sh`. The project is then in ~/work/repo; open new shells with `. ~/.profile`.
+
+Review the Django settings for security risks and write a prioritized review in SECURITY-REVIEW.md.
+
+Please keep this to about 10 minutes. When you are done, reply with a short summary of what you did.
+
+ATTACHMENT:"https://app.devin.ai/attachments/da9d8084-4561-4efa-9d57-ee8ff5a3fcfe/project.tar.gz"
+
+[devin] @ 1795251103 (event-01a1fd4de7417e63889c6848dec098cc)
+Starting on the ticket: reading it and memory, then working it end to end.
+
+[devin] @ 1795251161 (event-01a1fd4ec9747bd28328db6749a67375)
+I wrote the prioritized review in <ref_snippet file="/home/ubuntu/work/repo/SECURITY-REVIEW.md" lines="1-53" live="true"/>. It's committed on `devin/1795251143-security-review` and pushed to the workspace's local origin. That remote is a local bare repo, so there's no PR to link.
+
+- **Critical:** the secret key is hardcoded in the settings file, and `DEBUG = True`.
+- **High:** `ALLOWED_HOSTS = ["*"]`, and the session and CSRF cookies aren't marked secure.
+- **Medium:** HTTPS redirect, HSTS and trusted CSRF origins aren't set.
+- **Low:** SQLite uses a relative path. The health route is fine as it is.
+
+The settings file isn't tracked in git, so the key was never committed, and I left it out of the commit. It still left the machine inside the tarball, so the review recommends generating a new key for production.
+
+ATTACHMENT:{"url":"https://app.devin.ai/attachments/578ecc00-827d-4888-9e6c-cfedd10de846/SECURITY-REVIEW.md","fileSize":4389}
+
+[devin] @ 1795251164 (event-01a1fd4ed4c47043a79d983600cb4fb4)
+I wrote a prioritized review in SECURITY-REVIEW.md (attached). It's committed on `devin/1795251143-security-review` and pushed to the workspace's local origin; that remote is a local bare repo, so there's no PR to link. Critical: the hardcoded secret key and `DEBUG = True`. High: `ALLOWED_HOSTS = ["*"]` and insecure cookies. I left out the untracked settings file because it holds the key, and the review recommends a new key for production.
+
+ATTACHMENT:{"url":"https://app.devin.ai/attachments/18336b23-467e-4a60-9f13-ea7ae4a4add1/SECURITY-REVIEW.md","fileSize":4389}

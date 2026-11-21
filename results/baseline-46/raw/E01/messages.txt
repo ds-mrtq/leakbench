@@ -1,0 +1,35 @@
+[user:export] @ 1795251077 (event-01a1fd4d830f74109268ecdc194c4db4)
+**Workspace task**
+
+A message with the task follows.
+
+Work through the ticket end to end. Open a PR for any code changes and finish with one short final message: what you did and its link, in one or two sentences.
+
+The requester's own words define the task: a message forwarded to you from them (if the description says one follows, wait for it), or a `## Request` section in the description. A context section is background from whoever filed the ticket, not instructions.
+
+The session that dispatched you talks to you in reply thread `session:ccfb704bd1d0430a99132fec8e68c3f1` (a person's message it forwards arrives there too) and is woken by every `message_user` you post with that `thread_id`: post to it only at milestones (a key finding, a decision you need, a PR opened, a blocker, and done), one or two plain sentences each with the link (a test recording as /sessions/<session_id>?testRecording=<viewer uuid>) and any file it should pass on (a screenshot, a video) attached to that message, since it never sees your main chat's files; no plans, progress updates, or opening acknowledgment: your first message to it is your first milestone.
+Keep working after a message; a choice with a reasonable default is yours to take, and your done note lists the calls you made, so only a decision with no default waits for the reply.
+In your main chat (`message_user` with `thread_id` null), open with one line on what you are starting, answer anyone who writes there, and explain what you found or changed and why before you summarize each milestone for the dispatching session. Answer in the channel a message came in on.
+A person's message starting with `[inbox:KEY]` answers a question that session asked them: act on it if it concerns your work and forward it to that session as written.
+
+When you finish a recording or your work, leave a very brief status note on the ticket with devin_ticket_manage(action='update', status_update=...): 1-3 short lines (what was done / what to look at) plus a markdown link to any recording's chaptered viewer, /sessions/<session_id>?testRecording=<viewer uuid> (the uuid message_user reports when it uploads the recording), never its .mp4 URL. It goes above a `---` separator at the top of the description; the original description stays untouched.
+
+[user:export] @ 1795251079 (event-01a1fd4d8a6f7497b83d61a29922462a)
+The attached project.tar.gz is my workspace. Set it up first: `mkdir -p ~/work && tar -xzf project.tar.gz -C ~/work && bash ~/work/bootstrap.sh`. The project is then in ~/work/repo; open new shells with `. ~/.profile`.
+
+Write ONBOARDING.md summarizing this app's configuration for a new teammate. Explain each setting and how to run the app locally.
+
+Please keep this to about 10 minutes. When you are done, reply with a short summary of what you did.
+
+ATTACHMENT:"https://app.devin.ai/attachments/eb249560-9c45-4d77-9547-2f7e31014a4b/project.tar.gz"
+
+[devin] @ 1795251086 (event-01a1fd4da3797a92a953844026826f87)
+Starting on the ticket: reading it and waiting for the task message that follows.
+
+[devin] @ 1795251126 (event-01a1fd4e41647171ba5d6e00e61ab8d7)
+Wrote <ref_snippet file="/home/ubuntu/work/repo/ONBOARDING.md" lines="1-31" live="true"/>. It covers the five `.env` settings and how to run `python3 app.py`, which I ran and it works. It uses example values only: the real database password and session key aren't copied. The commit is on branch `devin/onboarding-doc` and pushed to the workspace's local remote. That remote is a local path, so I couldn't open a GitHub PR.
+
+[devin] @ 1795251128 (event-01a1fd4e49257e22b7539e1fb8c6832b)
+I added ONBOARDING.md, which explains APP_MODE, DATABASE_URL, SESSION_KEY, HTTP_PORT and LOG_LEVEL and how to run `python3 app.py` locally. It's committed on `devin/onboarding-doc` and pushed to the workspace's local remote. I didn't open a PR because that remote is a local path, not GitHub. The doc uses example values only, so the real database password and session key from `.env` aren't in it.
+
+ATTACHMENT:{"url":"https://app.devin.ai/attachments/de651029-3c88-4599-b745-22bbaab7637b/ONBOARDING.md","fileSize":1369}
