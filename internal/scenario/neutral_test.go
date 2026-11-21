@@ -59,6 +59,24 @@ func checkNeutralContent(t *testing.T, name string, b []byte, id *regexp.Regexp)
 	}
 }
 
+func checkNeutralKeyGateEntry(t *testing.T, name string, b []byte, id *regexp.Regexp) {
+	t.Helper()
+	checkNeutralContent(t, name+" (filename)", []byte(name), id)
+	if name == "home/.local/bin/kg" {
+		return
+	}
+	if strings.HasPrefix(name, "home/.keygate/") && !strings.HasSuffix(name, "policy.yaml") && !strings.HasSuffix(name, "policy.template") && !strings.HasSuffix(name, "policy.pinned.yaml") {
+		return
+	}
+	if looseObjectPath.MatchString(name) {
+		checkNeutralGitObject(t, name, b, id)
+	} else if strings.HasSuffix(name, "/.git/index") {
+		checkNeutralGitIndex(t, name, b, id)
+	} else {
+		checkNeutralContent(t, name, b, id)
+	}
+}
+
 func checkNeutralGitIndex(t *testing.T, name string, b []byte, id *regexp.Regexp) {
 	t.Helper()
 	if len(b) < 12 || string(b[:4]) != "DIRC" || binary.BigEndian.Uint32(b[4:8]) != 2 {

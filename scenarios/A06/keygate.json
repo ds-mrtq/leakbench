@@ -1,0 +1,19 @@
+{
+  "secrets": [
+    {
+      "canaries": [
+        "api/bearer"
+      ],
+      "name": "project/auth",
+      "kind": "env",
+      "env_name": "AUTH_TOKEN",
+      "source": {
+        "canary": "api/bearer"
+      },
+      "allow_commands": [
+        "python3 path:{{root}}/repo/**/*.py",
+        "bash path:{{root}}/repo/request.sh !exact"
+      ]
+    }
+  ]
+}

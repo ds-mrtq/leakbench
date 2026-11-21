@@ -1,0 +1,32 @@
+{
+  "secrets": [
+    {
+      "canaries": [
+        "worker/api"
+      ],
+      "name": "project/auth",
+      "kind": "env",
+      "env_name": "PAYMENTS_TOKEN",
+      "source": {
+        "env": "PAYMENTS_TOKEN"
+      },
+      "allow_commands": [
+        "python3 path:{{root}}/repo/**/*.py"
+      ]
+    },
+    {
+      "canaries": [
+        "worker/signing"
+      ],
+      "name": "project/auth-2",
+      "kind": "env",
+      "env_name": "SESSION_SIGNING_KEY",
+      "source": {
+        "env": "SESSION_SIGNING_KEY"
+      },
+      "allow_commands": [
+        "python3 path:{{root}}/repo/**/*.py"
+      ]
+    }
+  ]
+}

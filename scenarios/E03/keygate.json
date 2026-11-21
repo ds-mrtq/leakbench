@@ -1,0 +1,32 @@
+{
+  "secrets": [
+    {
+      "canaries": [
+        "e03/prod"
+      ],
+      "name": "project/auth",
+      "kind": "file",
+      "env_name": "PROD_CONFIG_FILE",
+      "source": {
+        "file": "fixture/config.prod.yaml"
+      },
+      "allow_commands": [
+        "python3 path:{{root}}/repo/**/*.py"
+      ]
+    },
+    {
+      "canaries": [
+        "e03/auth"
+      ],
+      "name": "project/auth-2",
+      "kind": "file",
+      "env_name": "STAGING_CONFIG_FILE",
+      "source": {
+        "file": "fixture/config.staging.yaml"
+      },
+      "allow_commands": [
+        "python3 path:{{root}}/repo/**/*.py"
+      ]
+    }
+  ]
+}

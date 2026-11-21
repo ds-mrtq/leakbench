@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/ds-mrtq/leakbench/internal/scenario"
 )
@@ -13,6 +14,8 @@ func runRender(args []string, out io.Writer) error {
 	f.SetOutput(io.Discard)
 	dir := f.String("scenario", "", "scenario directory")
 	dest := f.String("out", "", "empty output directory")
+	pass := f.String("pass", "baseline", "baseline|keygate")
+	kg := f.String("kg-binary", os.Getenv("LB_KG_BINARY"), "pinned kgtest binary (or LB_KG_BINARY)")
 	if err := f.Parse(args); err != nil {
 		return err
 	}
@@ -27,7 +30,7 @@ func runRender(args []string, out io.Writer) error {
 	if err != nil {
 		return err
 	}
-	if err = scenario.Render(s, m, *dest); err != nil {
+	if err = scenario.RenderWithOptions(s, m, *dest, scenario.RenderOptions{Pass: *pass, KGBinary: *kg}); err != nil {
 		return err
 	}
 	_, err = fmt.Fprintf(out, "Rendered %s to %s (manifest.json and bundle.tar.gz)\n", s.ID, *dest)
@@ -47,6 +50,11 @@ func runLint(args []string, out io.Writer) error {
 	all, err := scenario.LoadAll(*root)
 	if err != nil {
 		return err
+	}
+	for _, s := range all {
+		if _, err := scenario.LoadKeyGate(s); err != nil {
+			return fmt.Errorf("%s: %w", s.ID, err)
+		}
 	}
 	_, err = fmt.Fprintf(out, "Linted %d scenarios\n", len(all))
 	return err
