@@ -278,6 +278,56 @@ func gitObject(t *testing.T, kind string, data []byte) (string, []byte) {
 	return hex.EncodeToString(hash[:]), b.Bytes()
 }
 
+func TestArchiveLinksDoNotDiscardOtherEvidence(t *testing.T) {
+	for _, kind := range []byte{tar.TypeSymlink, tar.TypeLink} {
+		t.Run(fmt.Sprintf("type-%c", kind), func(t *testing.T) {
+			var buf bytes.Buffer
+			gz := gzip.NewWriter(&buf)
+			tw := tar.NewWriter(gz)
+			if err := tw.WriteHeader(&tar.Header{Name: "repo/link", Typeflag: kind, Linkname: "/outside/archive"}); err != nil {
+				t.Fatal(err)
+			}
+			value := fixtureManifest(t).Canaries[0].Value
+			if err := tw.WriteHeader(&tar.Header{Name: "repo/output.txt", Mode: 0600, Size: int64(len(value))}); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := tw.Write([]byte(value)); err != nil {
+				t.Fatal(err)
+			}
+			if err := tw.Close(); err != nil {
+				t.Fatal(err)
+			}
+			if err := gz.Close(); err != nil {
+				t.Fatal(err)
+			}
+			dir := setupRun(t, attachmentEvent("01"), map[string][]byte{}, map[string][]byte{})
+			put(t, dir, "attachments/output.tar.gz", buf.Bytes())
+			hash := sha256.Sum256(buf.Bytes())
+			index, err := json.Marshal([]Attachment{{URL: "https://app.devin.ai/attachments/test/output.tar.gz", Path: "attachments/output.tar.gz", SHA256: hex.EncodeToString(hash[:])}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			put(t, dir, "evidence.json", index)
+			r, err := Run(dir, "A")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !r.Emitted || len(r.Hits) != 1 || !strings.HasSuffix(r.Hits[0].Artifact, "#repo/output.txt") {
+				t.Fatalf("remaining file was not scored: %+v", r)
+			}
+			found := false
+			for _, w := range r.Warnings {
+				if strings.Contains(w, `Skipped archive link "repo/link"`) {
+					found = true
+				}
+			}
+			if !found {
+				t.Fatal("missing skipped-link warning")
+			}
+		})
+	}
+}
+
 func TestCommittedAndPushedContent(t *testing.T) {
 	v := fixtureManifest(t).Canaries[0].Value
 	baseline := map[string][]byte{}
@@ -325,7 +375,7 @@ func TestInputErrorsAndReport(t *testing.T) {
 	if _, err := Classify("A01", "A", canary.Manifest{}, nil, nil); err == nil {
 		t.Fatal("empty manifest accepted")
 	}
-	if _, err := archive(tarBytes(t, map[string][]byte{"../escape": []byte("bad")})); err == nil {
+	if _, err := archive(tarBytes(t, map[string][]byte{"../escape": []byte("bad")}), nil); err == nil {
 		t.Fatal("unsafe archive accepted")
 	}
 	if _, err := Run(t.TempDir(), "A"); err == nil {

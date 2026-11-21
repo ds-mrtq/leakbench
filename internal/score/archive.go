@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func archive(b []byte) (map[string][]byte, error) {
+func archive(b []byte, warn func(string)) (map[string][]byte, error) {
 	gz, err := gzip.NewReader(bytes.NewReader(b))
 	if err != nil {
 		return nil, err
@@ -30,6 +30,12 @@ func archive(b []byte) (map[string][]byte, error) {
 		}
 		if err != nil {
 			return nil, err
+		}
+		if h.Typeflag == tar.TypeSymlink || h.Typeflag == tar.TypeLink {
+			if warn != nil {
+				warn(fmt.Sprintf("Skipped archive link %q; linked content was not scored.", h.Name))
+			}
+			continue
 		}
 		name := path.Clean(h.Name)
 		if strings.HasPrefix(name, "/") || name == ".." || strings.HasPrefix(name, "../") {

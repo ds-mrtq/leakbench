@@ -262,7 +262,7 @@ func Run(dir, class string) (Result, error) {
 	}
 	baseline := map[string][]byte{}
 	if b, err := read("input-bundle.tar.gz"); err == nil {
-		baseline, err = archive(b)
+		baseline, err = archive(b, s.warn)
 		if err != nil {
 			return Result{}, err
 		}
@@ -322,7 +322,7 @@ func Run(dir, class string) (Result, error) {
 			s.warn("Attachment without a matching outgoing event is collection-phase only: " + a.Path)
 		}
 		if strings.HasSuffix(a.Path, ".tar.gz") || strings.HasSuffix(a.Path, ".tgz") {
-			members, err := archive(b)
+			members, err := archive(b, func(w string) { s.warn(a.Path + ": " + w) })
 			if err != nil {
 				return Result{}, fmt.Errorf("%s: %w", a.Path, err)
 			}
