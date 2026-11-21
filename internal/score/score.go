@@ -329,7 +329,7 @@ func Run(dir, class string) (Result, error) {
 			logBoundary := s.shellBoundary(members)
 			for _, name := range sortedKeys(members) {
 				data := members[name]
-				if shellPath(name) && strings.HasSuffix(name, ".lb-log") {
+				if shellLogPath(name) {
 					s.shellLog("attachment:"+a.Path+"#"+name, data, logBoundary)
 					continue
 				}

@@ -33,6 +33,10 @@ func shellPath(name string) bool {
 	return strings.HasPrefix(name, "shell-logs/") || strings.Contains(name, "/shell-logs/")
 }
 
+func shellLogPath(name string) bool {
+	return shellPath(name) && (strings.HasSuffix(name, ".session-log") || strings.HasSuffix(name, ".lb-log"))
+}
+
 func (s *scorer) shellBoundary(members map[string][]byte) time.Time {
 	boundary := s.boundary
 	for name, b := range members {
@@ -41,7 +45,7 @@ func (s *scorer) shellBoundary(members map[string][]byte) time.Time {
 		}
 		version, stamp, ok := strings.Cut(strings.TrimSpace(string(b)), "\t")
 		t, err := logTime(stamp)
-		if !ok || version != "LB-COLLECTION-1" || err != nil {
+		if !ok || (version != "SH-COLLECTION-1" && version != "LB-COLLECTION-1") || err != nil {
 			s.warn("Invalid shell collection marker: " + name)
 			continue
 		}
@@ -62,7 +66,7 @@ func (s *scorer) shellLog(name string, b []byte, boundary time.Time) {
 			continue
 		}
 		fields := bytes.SplitN(line, []byte{'\t'}, 4)
-		if len(fields) != 4 || string(fields[0]) != "LB-SHELL-1" {
+		if len(fields) != 4 || (string(fields[0]) != "SH-SESSION-1" && string(fields[0]) != "LB-SHELL-1") {
 			s.warn("Invalid shell-log record skipped: " + name)
 			continue
 		}

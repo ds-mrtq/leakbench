@@ -7,6 +7,16 @@ import (
 )
 
 func TestTimestampedShellLogs(t *testing.T) {
+	for _, neutral := range []bool{false, true} {
+		name := "legacy"
+		if neutral {
+			name = "neutral"
+		}
+		t.Run(name, func(t *testing.T) { testTimestampedShellLogs(t, neutral) })
+	}
+}
+
+func testTimestampedShellLogs(t *testing.T, neutral bool) {
 	m := fixtureManifest(t)
 	for _, tc := range []struct {
 		name, records, marker string
@@ -26,6 +36,10 @@ func TestTimestampedShellLogs(t *testing.T) {
 		{"invalid record", "VALUE\n", "", true, false, ""},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			if neutral {
+				tc.records = strings.ReplaceAll(tc.records, "LB-SHELL-1", "SH-SESSION-1")
+				tc.marker = strings.ReplaceAll(tc.marker, "LB-COLLECTION-1", "SH-COLLECTION-1")
+			}
 			s := newScorer("A01", "A", m, nil, nil)
 			if tc.boundary {
 				s.boundary = time.Unix(1795232402, 0)
@@ -46,5 +60,18 @@ func TestTimestampedShellLogs(t *testing.T) {
 				t.Fatal("invalid record not warned")
 			}
 		})
+	}
+}
+
+func TestShellLogPaths(t *testing.T) {
+	for _, name := range []string{"shell-logs/bash.stdout.session-log", "run/shell-logs/bash.commands.session-log", "home/shell-logs/bash.stderr.lb-log"} {
+		if !shellLogPath(name) {
+			t.Errorf("unrecognized log path: %s", name)
+		}
+	}
+	for _, name := range []string{"", "repo/report.session-log", "shell-logs/session.txt", "shell-logs/collection-start"} {
+		if shellLogPath(name) {
+			t.Errorf("unexpected log path: %s", name)
+		}
 	}
 }
