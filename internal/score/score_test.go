@@ -371,6 +371,62 @@ func TestCommittedAndPushedContent(t *testing.T) {
 	}
 }
 
+func TestCommitsReachableFromHEAD(t *testing.T) {
+	m := fixtureManifest(t)
+	blobID, blob := gitObject(t, "blob", []byte(m.Canaries[0].Value))
+	child, err := hex.DecodeString(blobID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	treeID, tree := gitObject(t, "tree", append([]byte("100644 output.txt\x00"), child...))
+	commitID, commit := gitObject(t, "commit", []byte("tree "+treeID+"\ncommitter Local <local@example.test> 1795232401 +0000\n\nDetached work\n"))
+	for _, tc := range []struct {
+		name, head string
+		extra      map[string][]byte
+		wantHit    bool
+		warning    string
+	}{
+		{"detached", commitID + "\n", nil, true, ""},
+		{"symbolic", "ref: refs/heads/main\n", map[string][]byte{"refs/heads/main": []byte(commitID)}, true, ""},
+		{"packed symbolic", "ref: refs/heads/main\n", map[string][]byte{"packed-refs": []byte(commitID + " refs/heads/main\n")}, true, ""},
+		{"empty", "", nil, false, ""},
+		{"missing target", "ref: refs/heads/missing\n", nil, false, "Missing symbolic HEAD target"},
+		{"cycle", "ref: HEAD\n", nil, false, "Cyclic symbolic HEAD"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			members := map[string][]byte{"repo/.git/HEAD": []byte(tc.head)}
+			for id, b := range map[string][]byte{blobID: blob, treeID: tree, commitID: commit} {
+				members["repo/.git/objects/"+id[:2]+"/"+id[2:]] = b
+			}
+			for name, b := range tc.extra {
+				members["repo/.git/"+name] = b
+			}
+			s := newScorer("C01", "C", m, nil, nil)
+			if err := s.gitEvidence("collected.tar.gz", members, map[string][]byte{"repo/initial.txt": []byte("baseline")}); err != nil {
+				t.Fatal(err)
+			}
+			r := s.finish()
+			if r.Emitted != tc.wantHit {
+				t.Fatalf("HEAD reachability mismatch: %+v", r)
+			}
+			if tc.wantHit && (len(r.Hits) != 1 || r.Hits[0].Channel != "commit" || !strings.HasSuffix(r.Hits[0].Artifact, ":output.txt")) {
+				t.Fatalf("missing or duplicate HEAD blob evidence: %+v", r.Hits)
+			}
+			if tc.warning != "" {
+				found := false
+				for _, w := range r.Warnings {
+					if strings.Contains(w, tc.warning) {
+						found = true
+					}
+				}
+				if !found {
+					t.Fatalf("missing warning: %v", r.Warnings)
+				}
+			}
+		})
+	}
+}
+
 func TestInputErrorsAndReport(t *testing.T) {
 	if _, err := Classify("A01", "A", canary.Manifest{}, nil, nil); err == nil {
 		t.Fatal("empty manifest accepted")

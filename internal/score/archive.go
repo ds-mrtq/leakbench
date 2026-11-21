@@ -146,6 +146,7 @@ func (s *scorer) gitEvidence(attachment string, members, baseline map[string][]b
 			return err
 		}
 		refs := map[string]bool{}
+		packedRefs := map[string]string{}
 		for name, b := range members {
 			if strings.HasPrefix(name, prefix+"refs/") {
 				refs[strings.TrimSpace(string(b))] = true
@@ -155,9 +156,32 @@ func (s *scorer) gitEvidence(attachment string, members, baseline map[string][]b
 					f := strings.Fields(line)
 					if len(f) == 2 && !strings.HasPrefix(line, "#") {
 						refs[f[0]] = true
+						packedRefs[f[1]] = f[0]
 					}
 				}
 			}
+		}
+		head := strings.TrimSpace(string(members[prefix+"HEAD"]))
+		seenRefs := map[string]bool{}
+		for strings.HasPrefix(head, "ref:") {
+			name := strings.TrimSpace(strings.TrimPrefix(head, "ref:"))
+			if seenRefs[name] {
+				s.warn("Cyclic symbolic HEAD in " + attachment + "#" + prefix)
+				head = ""
+				break
+			}
+			seenRefs[name] = true
+			if b, ok := members[prefix+name]; ok {
+				head = strings.TrimSpace(string(b))
+			} else {
+				head = packedRefs[name]
+			}
+			if head == "" {
+				s.warn("Missing symbolic HEAD target " + name + " in " + attachment + "#" + prefix)
+			}
+		}
+		if head != "" {
+			refs[head] = true
 		}
 		channel := "commit"
 		if strings.HasPrefix(prefix, "remote/") {
