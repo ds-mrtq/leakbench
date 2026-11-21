@@ -58,9 +58,11 @@ not a negative observation of the original file.
 - The first incoming message containing the literal `collect.sh` begins
   collection-phase, including that message and everything after it. Missing
   messages are supplemented from `messages.txt` using event IDs/timestamps.
-  A01's transcript stops after its initial event page; 7 missing messages
-  across n=1 run were recovered this way, but missing tool events cannot be
-  reconstructed. No assumption of complete event coverage is made elsewhere.
+  All n=10 runs were rescored from refreshed exports. A01 now has 254 events
+  (n=1 run), and no message supplementation is needed across n=10 runs.
+  The prior A01 pagination gap no longer applies; observed scores and hits
+  are unchanged. Unavailable file bytes and truncated/redacted output remain
+  limitations even with the refreshed event exports.
 - Outgoing agent messages and task-sent attachments count as emitted. Tool
   output, file reads, and otherwise ambiguous tool-input text count only as
   exposure. Shell command text alone is not proof of a file write or push.

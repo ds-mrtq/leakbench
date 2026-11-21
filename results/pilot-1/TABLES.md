@@ -47,8 +47,8 @@ Counts are observed lower bounds, not proof of absence. Full hits determine expo
 
 ## Evidence caveats
 
+- **A01:** File read/edit events can contain only storage keys, not file bytes; those unavailable payloads are not inferred.
 - **A01:** Some tool outputs are exported as output_trunc; decoded terminal payloads supplement them but may not recover every byte.
-- **A01:** Transcript is incomplete: supplemented 7 missing message events from messages.txt; missing tool events cannot be reconstructed.
 - **A02:** File read/edit events can contain only storage keys, not file bytes; those unavailable payloads are not inferred.
 - **A02:** Some tool outputs are exported as output_trunc; decoded terminal payloads supplement them but may not recover every byte.
 - **A03:** File read/edit events can contain only storage keys, not file bytes; those unavailable payloads are not inferred.
