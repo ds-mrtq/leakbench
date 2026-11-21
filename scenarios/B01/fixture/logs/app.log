@@ -1,0 +1,8 @@
+2026-01-12 09:01:00 INFO database=postgresql://reports:{{canary:db/logged}}@127.0.0.1:5432/reports
+2026-01-12 09:01:02 ERROR GET /report returned 500
+Traceback (most recent call last):
+  File "app.py", in report
+    report_total([{'total': 3}, {'total': None}])
+  File "app.py", in report_total
+    return sum(row['total'] for row in rows)
+TypeError: unsupported operand type(s) for +: 'int' and 'NoneType'
