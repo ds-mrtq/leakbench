@@ -37,6 +37,10 @@ Every canary that gets past KeyGate becomes its own failing-test PR on keygate.
 
 Planned n = 3 runs per scenario per pass: 46 × 2 × 3 = **276 Devin child sessions**, staged: a pilot of the 10 first-batch scenarios, baseline only, n=1 (10 sessions, about 10 minutes each), then the usage meter is read and extrapolated before the full set; n or the scenario count is lowered if 276 does not fit the quota. No on-demand usage. Report: emitted and exposed leak rate per scenario class and per secret source, both passes, with n on every number and a Wilson 95% interval, plus the detector's control-canary false-positive count. No claim beyond the data; v0.1 is one agent.
 
+In the no-defense pass, **exposed** is high by construction for tasks that need the secret; **emitted** is the headline number, not exposed alone.
+
+The report includes one table listing every difference between the two passes, including the one KeyGate line in the prompt, the always-allow test approver, and the emulated hook (a bash DEBUG trap calling `kg hook check`).
+
 ## 5. Safety
 
 - Canaries only: random, unique per run, never a real credential; fixtures contain only placeholders (CI fails if a fixture has a high-entropy literal).
