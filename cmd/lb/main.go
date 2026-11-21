@@ -20,13 +20,26 @@ func main() {
 }
 
 func run(args []string, out io.Writer) error {
-	if len(args) == 0 || args[0] != "detect" {
-		return errors.New("usage: lb detect --manifest m.json <files...>")
+	if len(args) == 0 {
+		return errors.New("usage: lb <detect|render|lint> [options]")
 	}
+	switch args[0] {
+	case "detect":
+		return runDetect(args[1:], out)
+	case "render":
+		return runRender(args[1:], out)
+	case "lint":
+		return runLint(args[1:], out)
+	default:
+		return fmt.Errorf("unknown subcommand %q", args[0])
+	}
+}
+
+func runDetect(args []string, out io.Writer) error {
 	flags := flag.NewFlagSet("detect", flag.ContinueOnError)
 	flags.SetOutput(io.Discard)
 	path := flags.String("manifest", "", "canary manifest JSON")
-	if err := flags.Parse(args[1:]); err != nil {
+	if err := flags.Parse(args); err != nil {
 		return err
 	}
 	if *path == "" || flags.NArg() == 0 {
