@@ -1,6 +1,5 @@
 """Report freshness, bilingual HTML/data consistency and changing-cohort checks."""
 
-import copy
 import importlib.util
 from pathlib import Path
 import re
@@ -25,6 +24,44 @@ def metrics(page):
 
 def visible_numbers(page):
     return re.findall(r'\d+', ' '.join(page.find('body').itertext()))
+
+
+def synthetic_data(c_runs=0, c_emitted=0, c_exposed=0):
+    data = {}
+    awareness_keys = ('benchmark', 'canary', 'leakbench', 'literal_test', 'evaluation',
+                      'being_tested_language', 'memory_commands', 'repos_commands', 'executed_kg',
+                      'used_session_or_bot_tools', 'used_own_ticket_tools', 'ticket_scope_unverified',
+                      'possibly_test_aware')
+    for name in report.DATASETS:
+        runs = []
+        for klass in 'ABCDE':
+            n = c_runs if klass == 'C' and name in report.KEYGATE[1:] else 4
+            for i in range(n):
+                runs.append({'run': f'{klass}{i + 1:02}', 'class': klass + '. Synthetic',
+                             'emitted': klass == 'C' and name in report.KEYGATE[1:] and i < c_emitted,
+                             'exposed': klass == 'C' and name in report.KEYGATE[1:] and i < c_exposed,
+                             'intervened': False, 'collection': {'outcome': 'archive', 'decrypted': True},
+                             'missing_outgoing_attachments': []})
+        classes = []
+        for klass in 'ABCDE':
+            selected = [r for r in runs if r['class'].startswith(klass + '.')]
+            classes.append({'class_id': klass, 'n': len(selected),
+                            'emitted_runs': sum(r['emitted'] for r in selected),
+                            'exposed_runs': sum(r['exposed'] for r in selected)})
+        n = len(runs)
+        if name in report.KEYGATE:
+            data[name] = {'summary': {'all': {'n': n, 'classes': classes}, 'runs': runs},
+                          'setup': {'counts': {'n': n, 'ran': n, 'claimed-ran': 0, 'skipped': 0, 'unknown': 0},
+                                    'ids': {'skipped': []}}}
+            if name in report.KEYGATE[1:]:
+                data[name]['audit'] = {'self_reported_pushes': [], 'transcript_claimed_pushes': [], 'runs': {}}
+        else:
+            data[name] = {'summary': {'n': n, 'classes': classes, 'runs': runs,
+                                     'collection_counts': {'requested': n, 'refused': 0, 'no_collect_step': 0,
+                                                           'authenticated_archives': n, 'archive': n, 'redacted': 0},
+                                     'awareness_counts': dict.fromkeys(awareness_keys, 0),
+                                     'semantic_awareness_review': {}}}
+    return data
 
 
 class ReportTests(unittest.TestCase):
@@ -63,10 +100,12 @@ class ReportTests(unittest.TestCase):
         page = metrics(parse(report.render(self.data, 'en')))
         baseline = self.data['baseline-46']['summary']
         baseline3 = self.data['baseline-n3']['summary']
+        baseline_a = [r for r in baseline['runs'] if r['class'].startswith('A.')]
+        baseline3_a = [r for r in baseline3['runs'] if r['class'].startswith('A.')]
         pooled = [r for name in report.KEYGATE for r in self.data[name]['summary']['runs']]
         checks = {
-            'exposed-baseline-46-A': (sum(r['exposed'] for r in baseline['runs'] if r['class'].startswith('A.')), 10),
-            'emitted-baseline-n3-A': (sum(r['emitted'] for r in baseline3['runs'] if r['class'].startswith('A.')), 30),
+            'exposed-baseline-46-A': (sum(r['exposed'] for r in baseline_a), len(baseline_a)),
+            'emitted-baseline-n3-A': (sum(r['emitted'] for r in baseline3_a), len(baseline3_a)),
             'exposed-baseline-n3-total': (sum(r['exposed'] for r in baseline3['runs']), len(baseline3['runs'])),
             'emitted-keygate-pooled-C': (sum(r['emitted'] for r in pooled if r['class'].startswith('C.')), sum(r['class'].startswith('C.') for r in pooled)),
             'emitted-keygate-pooled-total': (sum(r['emitted'] for r in pooled), len(pooled)),
@@ -75,27 +114,22 @@ class ReportTests(unittest.TestCase):
             self.assertEqual(page[key], f'{k}/{n}')
 
     def test_class_c_arrives_without_generator_changes(self):
-        changed = copy.deepcopy(self.data)
-        for name in ('keygate-r2', 'keygate-r3'):
-            c = next(c for c in changed[name]['summary']['all']['classes'] if c['class_id'] == 'C')
-            c.update(n=9, emitted_runs=1, exposed_runs=2)
+        changed = synthetic_data(c_runs=4, c_emitted=1, c_exposed=2)
         page = metrics(parse(report.render(changed, 'en')))
-        self.assertEqual(page['emitted-keygate-r2-C'], '1/9')
-        self.assertEqual(page['exposed-keygate-r3-C'], '2/9')
-        self.assertEqual(page['emitted-keygate-pooled-C'], '2/27')
-        self.assertEqual(page['exposed-keygate-pooled-C'], '4/27')
+        self.assertEqual(page['emitted-keygate-r2-C'], '1/4')
+        self.assertEqual(page['exposed-keygate-r3-C'], '2/4')
+        self.assertEqual(page['emitted-keygate-pooled-C'], '2/12')
+        self.assertEqual(page['exposed-keygate-pooled-C'], '4/12')
 
     def test_c_pool_note_disappears_with_complete_c_data(self):
-        changed = copy.deepcopy(self.data)
-        for language, note in [('en', 'The KeyGate C pool currently has n=9;'), ('vi', 'Nhóm C gộp của KeyGate hiện có n=9;')]:
+        changed = synthetic_data()
+        for language, note in [('en', 'The KeyGate C pool currently has n=4;'), ('vi', 'Nhóm C gộp của KeyGate hiện có n=4;')]:
             self.assertIn(note, report.render(changed, language))
-        for name in ('keygate-r2', 'keygate-r3'):
-            c = next(c for c in changed[name]['summary']['all']['classes'] if c['class_id'] == 'C')
-            c.update(n=9)
+        changed = synthetic_data(c_runs=4)
         for language, note in [('en', 'The KeyGate C pool'), ('vi', 'Nhóm C gộp của KeyGate')]:
             page = report.render(changed, language)
             self.assertNotIn(note, page)
-            self.assertEqual(metrics(parse(page))['emitted-keygate-pooled-C'], '0/27')
+            self.assertEqual(metrics(parse(page))['emitted-keygate-pooled-C'], '0/12')
 
     def test_empty_class_and_escaping(self):
         self.assertEqual(report.count({'classes': []}, 'C', 'emitted'), (0, 0))
