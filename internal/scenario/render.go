@@ -21,6 +21,24 @@ import (
 // deliberately outside the archive: it is runner state, not agent input.
 // outDir must be empty to avoid overwriting a previous run.
 func Render(s Scenario, m canary.Manifest, outDir string) error {
+	return RenderWithOptions(s, m, outDir, RenderOptions{})
+}
+
+func RenderWithOptions(s Scenario, m canary.Manifest, outDir string, opts RenderOptions) error {
+	if opts.Pass != "" && opts.Pass != "baseline" && opts.Pass != "keygate" {
+		return fmt.Errorf("unknown pass %q", opts.Pass)
+	}
+	var kg *KeyGateConfig
+	if opts.Pass == "keygate" {
+		var err error
+		kg, err = LoadKeyGate(s)
+		if err != nil {
+			return err
+		}
+		if opts.KGBinary == "" {
+			return fmt.Errorf("keygate pass requires --kg-binary or LB_KG_BINARY")
+		}
+	}
 	if err := Lint(s); err != nil {
 		return err
 	}
@@ -67,7 +85,13 @@ func Render(s Scenario, m canary.Manifest, outDir string) error {
 		return err
 	}
 	replace := func(text string) string {
-		return placeholder.ReplaceAllStringFunc(text, func(token string) string { return values[placeholder.FindStringSubmatch(token)[1]] })
+		return placeholder.ReplaceAllStringFunc(text, func(token string) string {
+			name := placeholder.FindStringSubmatch(token)[1]
+			if kg != nil {
+				return "[kg:" + kg.secretFor(name) + "]"
+			}
+			return values[name]
+		})
 	}
 	for _, pair := range [][2]string{{"fixture", "repo"}, {"home", "home"}} {
 		dest := filepath.Join(root, pair[1])
@@ -92,9 +116,18 @@ func Render(s Scenario, m canary.Manifest, outDir string) error {
 	}
 	sort.Strings(keys)
 	for _, key := range keys {
+		if kg != nil && placeholder.MatchString(s.Env[key]) {
+			continue
+		}
 		fmt.Fprintf(&env, "export %s=%s\n", key, shellQuote(replace(s.Env[key])))
 	}
-	for name, content := range map[string]string{"env.sh": env.String(), "bootstrap.sh": bootstrap(), "collect.sh": collect(publicKey), "session-init.sh": shellLogger} {
+	boot, logger := bootstrap(), shellLogger
+	if kg != nil {
+		env.WriteString(keyGateEnv)
+		boot = strings.Replace(boot, ". \"$root/env.sh\"\n", ". \"$root/env.sh\"\n"+keyGateStart, 1)
+		logger += keyGateHook
+	}
+	for name, content := range map[string]string{"env.sh": env.String(), "bootstrap.sh": boot, "collect.sh": collect(publicKey), "session-init.sh": logger} {
 		mode := fs.FileMode(0600)
 		if strings.HasSuffix(name, ".sh") {
 			mode = 0700
@@ -136,6 +169,14 @@ func Render(s Scenario, m canary.Manifest, outDir string) error {
 	}
 	if err = git(repo, "remote", "add", "origin", "~/remote/project.git"); err != nil {
 		return err
+	}
+	if kg != nil {
+		if err = provisionKeyGate(s, m, root, *kg, opts); err != nil {
+			return err
+		}
+		if err = os.WriteFile(filepath.Join(root, "prompt.txt"), []byte(s.Prompt+"\n"+KeyGatePrompt+"\n"), 0600); err != nil {
+			return err
+		}
 	}
 	b, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
@@ -301,6 +342,16 @@ func pack(root string) (err error) {
 		if err != nil {
 			return err
 		}
+	}
+	if b, e := os.ReadFile(filepath.Join(root, "prompt.txt")); e == nil {
+		if err = tw.WriteHeader(&tar.Header{Name: "prompt.txt", Mode: 0600, Size: int64(len(b))}); err != nil {
+			return err
+		}
+		if _, err = tw.Write(b); err != nil {
+			return err
+		}
+	} else if !os.IsNotExist(e) {
+		return e
 	}
 	return nil
 }
