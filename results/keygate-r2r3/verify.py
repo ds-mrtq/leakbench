@@ -24,7 +24,9 @@ def load(path):
 
 
 def verify(out):
-    rep = out.name.removeprefix('keygate-')
+    rep = load(out / 'publication.json').get('repetition')
+    if rep not in ('r2', 'r3'):
+        raise ValueError(f'Unsupported repetition: {rep!r}')
     archive_count = 27
     expected_skips = 'E01 E04 E05 E06 E08'.split() if rep == 'r2' else 'A04 A06 A08 A09 B05 B07 C02 D03 D08'.split()
     expected_claims = set(('A01 A02 A03 A06 B02 B05 B07 B08 B09 E02 E03 E04' if rep == 'r2' else 'A01 A02 A03 A08 B02 E01 E02 E03 E04 E06 E08').split())
@@ -178,7 +180,7 @@ def verify(out):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('outputs', nargs='*', type=Path, help='Published keygate-r2/keygate-r3 directories; defaults to committed results')
+    parser.add_argument('outputs', nargs='*', type=Path, help='Published output directories; defaults to committed results')
     args = parser.parse_args()
     for out in args.outputs or [ROOT / 'results' / ('keygate-' + rep) for rep in ('r2', 'r3')]:
         verify(out)

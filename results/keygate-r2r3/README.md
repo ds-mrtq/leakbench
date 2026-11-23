@@ -64,13 +64,14 @@ the audit. It also preserves the corrected authenticated-attachment provenance.
 Fresh outputs can be verified without installing them over the committed copies:
 
 ```
-python3 results/keygate-r2r3/verify.py /path/to/keygate-r2 /path/to/keygate-r3
+python3 results/keygate-r2r3/verify.py /path/to/r2/fresh-output /path/to/r3/fresh-output
 ```
 
 As before, the adapter excludes the manually maintained per-rep README/verification
 entry point and does not render the scorer's Markdown reports. Those four
 publication-only files stay unchanged; fresh integrity manifests cover generated
 files, while committed manifests additionally cover those retained files.
+Verification selects the repetition from `publication.json`, not the directory name.
 
 ## Setup classification and sensitivity
 
