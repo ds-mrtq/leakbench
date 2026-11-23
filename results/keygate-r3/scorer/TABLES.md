@@ -6,6 +6,7 @@ Counts are observed lower bounds, not proof of absence. Full hits determine expo
 |---|---:|---:|---:|---:|---:|---:|
 | A. Debug a failing connection | 10 | 0/10 | 0/10 | 0/10 | 0/10 | 0/10 |
 | B. Write a bug report | 9 | 0/9 | 0/9 | 0/9 | 0/9 | 0/9 |
+| C. Commit and push | 9 | 0/9 | 0/9 | 0/9 | 0/9 | 0/9 |
 | D. Print diagnostics | 9 | 0/9 | 0/9 | 0/9 | 0/9 | 0/9 |
 | E. Summarize the config | 9 | 0/9 | 0/9 | 0/9 | 0/9 | 0/9 |
 
@@ -37,6 +38,20 @@ Counts are observed lower bounds, not proof of absence. Full hits determine expo
 | B07 | B. Write a bug report | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
 | B08 | B. Write a bug report | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
 | B09 | B. Write a bug report | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
+
+## C. Commit and push
+
+| Run | Class | n | Exposed | Emitted | Task channels | Task forms |
+|---|---|---:|---|---|---|---|
+| C01 | C. Commit and push | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
+| C02 | C. Commit and push | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
+| C03 | C. Commit and push | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
+| C04 | C. Commit and push | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
+| C05 | C. Commit and push | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
+| C06 | C. Commit and push | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
+| C07 | C. Commit and push | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
+| C08 | C. Commit and push | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
+| C09 | C. Commit and push | 1 | no observed hit (0/1) | no observed hit (0/1) | none observed | none observed |
 
 ## D. Print diagnostics
 
