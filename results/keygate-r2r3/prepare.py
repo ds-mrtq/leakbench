@@ -17,11 +17,18 @@ def dump(path, value):
 
 def prepare(source, out, repetition):
     out.mkdir()
+    historical = source / 'provenance/part1'
+    if historical.is_dir():
+        for name in ('provenance.json', 'verification.json', 'self-reported-local-pushes.txt',
+                     'mapping-part1.txt', 'archives-part1.txt'):
+            shutil.copyfile(historical / name, out / name)
+        shutil.copytree(historical / 'github-guard', out / 'github-guard')
     excluded = {'README.md', 'prepare.py', 'verify.py', 'classify_setup.py',
-                'reconcile_pushes.py', 'verification.txt', 'helper-test-result.json'}
+                'reconcile_pushes.py', 'verification.txt', 'helper-test-result.json',
+                'integrity.json'}
     for path in sorted(source.rglob('*')):
         relative = path.relative_to(source)
-        if not path.is_file() or path.name in excluded or '__pycache__' in path.parts:
+        if not path.is_file() or path.name in excluded or '__pycache__' in path.parts or relative.parts[0] == 'provenance':
             continue
         dest = out / relative
         dest.parent.mkdir(parents=True, exist_ok=True)
@@ -49,22 +56,24 @@ def prepare(source, out, repetition):
         row['keygate_setup_classification'] = classified[ident]['setup']
         row['self_initiated_local_push'] = dict(
             reported=ident in audit['self_reported_pushes'],
-            transcript_match=ident in audit['transcript_claimed_pushes'],
+            transcript_match=ident in audit['self_reported_pushes'] and ident in audit['transcript_claimed_pushes'],
             corroboration='commands-and-refs' if commands and refs else 'ref-only' if refs else 'none')
         dump(out / (ident + '.json'), row)
     summary['without_skipped'] = setup['totals']['without_skipped']
     summary['skipped_ids'] = setup['ids']['skipped']
     dump(out / 'summary.json', summary)
+    dispatched = len(summary['runs'])
+    held = sorted({f'{c}{n:02}' for c in 'ABCDE' for n in range(1, 11 if c == 'A' else 10)} - {r['run'] for r in summary['runs']})
     dump(out / 'publication.json', dict(
-        repetition=repetition, partial=True, dispatched=37, planned=46,
-        held=[f'C{n:02}' for n in range(1, 10)],
-        source='Previously authenticated and scored runner results-part1 evidence',
+        repetition=repetition, partial=bool(held), dispatched=dispatched, planned=46,
+        held=held,
+        source='Previously authenticated and scored runner evidence; original part-1 plus owner-authorized C batch',
         manifest_policy='Plaintext values omitted; original manifest SHA-256 retained per run.',
         decryption_policy='Original authenticated receipts retained; private keys not published. Offline verification checks retained ciphertext/decrypted hashes, not fresh decryption.',
         scoring_policy='Original scores preserved. Fresh rescoring requires runner-only original manifests, deliberately not committed.'))
     paths = [p for p in sorted(out.rglob('*')) if p.is_file()]
     dump(out / 'integrity.json', {str(p.relative_to(out)): sha(p) for p in paths})
-    print(f'Prepared {repetition}: 37 runs, {len(paths)} evidence files; 37 plaintext manifests replaced by fingerprints.')
+    print(f'Prepared {repetition}: {dispatched} runs, {len(paths)} evidence files; plaintext manifests replaced by fingerprints.')
 
 
 if __name__ == '__main__':

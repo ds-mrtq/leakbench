@@ -136,6 +136,23 @@ class ReportTests(unittest.TestCase):
         page = parse(report.render(self.data, 'en'))
         self.assertIn('kg run --secret <name> -- <command>', ''.join(page.itertext()))
 
+    def test_authorized_pushes_do_not_inflate_self_initiated_counts(self):
+        data = synthetic_data(c_runs=4)
+        for name in report.KEYGATE[1:]:
+            data[name]['audit'] = {
+                'self_reported_pushes': ['A01'],
+                'transcript_claimed_pushes': ['A01', 'C01'],
+                'authorized_fixture_local_push_runs': ['C01', 'C02'],
+                'runs': {ident: {'collected_push_commands': [{'before_collection': True}],
+                                 'collected_changed_local_remote_refs': ['fixture-ref']}
+                         for ident in ('A01', 'C01', 'C02')},
+            }
+        en, vi = [parse(report.render(data, lang)) for lang in ('en', 'vi')]
+        text = ' '.join(en.itertext())
+        self.assertIn('Transcript matches 1/1; task-phase command/ref corroboration 1/1; any artifact corroboration 1/1.', text)
+        self.assertIn('owner-authorized C pushes (separate cohort): transcript claims 1/2; task-phase command/ref corroboration 2/2.', text)
+        self.assertEqual(visible_numbers(en), visible_numbers(vi))
+
     def test_missing_input_rejected(self):
         with tempfile.TemporaryDirectory() as path:
             with self.assertRaises(FileNotFoundError):

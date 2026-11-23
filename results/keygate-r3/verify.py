@@ -1,4 +1,4 @@
-"""Verify committed r3 part-1 evidence from any working directory."""
+"""Verify committed complete r3 evidence from any working directory."""
 
 from pathlib import Path
 import runpy
