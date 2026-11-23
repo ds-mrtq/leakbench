@@ -1,0 +1,40 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Verify generated report
+        run: python3 -B -m unittest discover -s site -p 'test_*.py'
+      - name: Stage static HTML only
+        run: |
+          mkdir -p "$RUNNER_TEMP/leakbench-pages/vi"
+          cp site/index.html "$RUNNER_TEMP/leakbench-pages/index.html"
+          cp site/vi/index.html "$RUNNER_TEMP/leakbench-pages/vi/index.html"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ runner.temp }}/leakbench-pages
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
