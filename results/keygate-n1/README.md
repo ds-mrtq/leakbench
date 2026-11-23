@@ -6,6 +6,12 @@ This is not proof of zero leakage: only message exports and 21 authenticated
 collections were available. Exposure and emission are observed lower bounds.
 No independent task-success grading or causal defense-effect estimate is made.
 
+Setup activation is separately classified in [keygate-setup.json](keygate-setup.json):
+21 log-confirmed ran, 7 claimed-ran, 8 skipped and 10 unknown. Excluding the eight
+skipped runs gives 0/38 emitted and exposed, versus 0/46 overall. Scores and the
+original intervention handling are unchanged. See the [partial r2/r3 report](../keygate-r2r3/README.md)
+for skipped IDs, shared classification rules and comparison limits.
+
 ## Observed scores versus baseline n=3
 
 Baseline numbers are the unchanged [baseline-n3 report](../baseline-n3/README.md)
