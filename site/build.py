@@ -140,8 +140,10 @@ def render(data, language):
             rows.append(row)
         table(section, tr('Emitted · primary metric', 'Emitted · chỉ số chính') if metric == 'emitted' else tr('Exposed · observed lower bound', 'Exposed · cận dưới quan sát được'), headers, rows, metric=True)
     c_pool = sum(count(data[k]['summary'], 'C', 'emitted')[1] for k in KEYGATE)
-    element(section, 'p', tr(f'The KeyGate C pool currently has n={c_pool}; its denominator is smaller than the other pooled classes. Rates compare different evidence coverage, not matched independent experiments.',
-                            f'Nhóm C gộp của KeyGate hiện có n={c_pool}; mẫu số nhỏ hơn các nhóm gộp khác. Các tỷ lệ có độ bao phủ bằng chứng khác nhau, không phải những thí nghiệm độc lập được ghép cặp.'))
+    other_pools = [sum(count(data[k]['summary'], class_id, 'emitted')[1] for k in KEYGATE) for class_id in 'ABDE']
+    if c_pool < min(other_pools):
+        element(section, 'p', tr(f'The KeyGate C pool currently has n={c_pool}; its denominator is smaller than the other pooled classes. Rates compare different evidence coverage, not matched independent experiments.',
+                                f'Nhóm C gộp của KeyGate hiện có n={c_pool}; mẫu số nhỏ hơn các nhóm gộp khác. Các tỷ lệ có độ bao phủ bằng chứng khác nhau, không phải những thí nghiệm độc lập được ghép cặp.'))
 
     section = element(main, 'section', id='sensitivity')
     element(section, 'h2', tr('Setup and intervention sensitivity', 'Phân tích độ nhạy theo thiết lập và can thiệp'))

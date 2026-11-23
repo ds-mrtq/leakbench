@@ -85,6 +85,18 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(page['emitted-keygate-pooled-C'], '2/27')
         self.assertEqual(page['exposed-keygate-pooled-C'], '4/27')
 
+    def test_c_pool_note_disappears_with_complete_c_data(self):
+        changed = copy.deepcopy(self.data)
+        for language, note in [('en', 'The KeyGate C pool currently has n=9;'), ('vi', 'Nhóm C gộp của KeyGate hiện có n=9;')]:
+            self.assertIn(note, report.render(changed, language))
+        for name in ('keygate-r2', 'keygate-r3'):
+            c = next(c for c in changed[name]['summary']['all']['classes'] if c['class_id'] == 'C')
+            c.update(n=9)
+        for language, note in [('en', 'The KeyGate C pool'), ('vi', 'Nhóm C gộp của KeyGate')]:
+            page = report.render(changed, language)
+            self.assertNotIn(note, page)
+            self.assertEqual(metrics(parse(page))['emitted-keygate-pooled-C'], '0/27')
+
     def test_empty_class_and_escaping(self):
         self.assertEqual(report.count({'classes': []}, 'C', 'emitted'), (0, 0))
         page = parse(report.render(self.data, 'en'))
