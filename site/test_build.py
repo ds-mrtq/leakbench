@@ -151,6 +151,8 @@ class ReportTests(unittest.TestCase):
         text = ' '.join(en.itertext())
         self.assertIn('Transcript matches 1/1; task-phase command/ref corroboration 1/1; any artifact corroboration 1/1.', text)
         self.assertIn('owner-authorized C pushes (separate cohort): transcript claims 1/2; task-phase command/ref corroboration 2/2.', text)
+        self.assertIn("Devin's authenticated attachment storage (download_attachment) from the URLs reported by Workspace Agent", text)
+        self.assertIn('kho tệp đính kèm có xác thực của Devin (download_attachment) từ các URL do Workspace Agent báo cáo', ' '.join(vi.itertext()))
         self.assertEqual(visible_numbers(en), visible_numbers(vi))
 
     def test_missing_input_rejected(self):

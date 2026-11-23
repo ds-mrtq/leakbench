@@ -13,8 +13,10 @@ between GitHub snapshots starting 13:24:19Z and 13:33:17Z. Its last collect repl
 was r3 C03 at 13:31:44Z (r2 C03 at 13:30:25Z). No GitHub side effects or
 non-local push were observed. r2 C07's retired.git local push failed before
 its project.git push succeeded; both are archive-corroborated. C01/C04 pushes
-are transcript-only. C ciphertext hashes identify owner-staged bytes, not
-independently supplied expected digests. Missing archives remain unverified.
+are transcript-only. C ciphertext hashes identify bytes fetched through Devin's
+authenticated attachment storage (`download_attachment`) from the URLs reported
+by Workspace Agent, not independently supplied expected digests. Missing archives
+remain unverified.
 
 Run `python3 results/keygate-r2/verify.py` from the repository root (or invoke it
 by absolute path from anywhere). This verifies committed evidence integrity,

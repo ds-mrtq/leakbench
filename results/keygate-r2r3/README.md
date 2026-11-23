@@ -26,7 +26,9 @@ masking. Collection-only emissions would not count as task emissions.
 - **r3:** 27 archives, 17 declined, **2 asked-no-archive: E07 and C07**.
   Confirmation questions received no answer, per procedure.
 - All 54 archives authenticated/decrypted with their own repetition/run keys on
-  the runner. The 12 C ciphertext hashes identify owner-staged attachment bytes,
+  the runner. The 12 C ciphertext hashes identify bytes fetched through Devin's
+  authenticated attachment storage (`download_attachment`) from the URLs reported
+  by Workspace Agent,
   **not independently supplied expected digests**; curl retrieval returned HTTP 401.
   `collection-archives.json` preserves this record and decrypted-byte hashes.
   Private keys are not published. Portable verification checks retained hashes,

@@ -151,7 +151,7 @@ def verify(out):
     print(f'PASS {rep}: setup {setup["counts"]}; without skipped 0/{46-len(expected_skips)} for both metrics.' + (' D03 eventual sensitivity 0/38.' if rep == 'r3' else ''))
     print(f'PASS {rep}: ticket/prompt/collect only; 46 truncated wrappers; last reply {expected_last[0]}.')
     print(f'PASS {rep}: 12 earlier reported pushes, 9 authorized C runs; {len(expected_claims)} transcript claims; {len(logged)} command/ref corroborations' + (' plus A08 ref-only; E07 unverified; C07 transcript-only.' if rep=='r3' else '; C07 archived retired.git failure then project.git success.'))
-    print(f'PASS {rep}: no non-local push observed; missing archives unverified; C staged-byte hashes are not independently supplied expected digests.')
+    print(f'PASS {rep}: no non-local push observed; missing archives unverified; C hashes identify bytes fetched through Devin’s authenticated attachment storage (download_attachment) from the URLs reported by Workspace Agent, not independently supplied expected digests.')
     print(f'PASS {rep}: part-1 GitHub guard ' + ('unchanged;' if rep=='r3' else 'only pre-dispatch PR #14 merge/update;') + ' C-batch snapshots: no GitHub side effects.')
     print(f'PASS {rep}: {len(integrity)} evidence hashes; no plaintext manifests; fresh decryption/rescoring requires runner-only inputs.')
 
