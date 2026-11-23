@@ -58,6 +58,20 @@ post-collect attachment, so remain declined. Other declined runs only refuse or
 offer an alternative without delivering one. The C batch therefore has **12
 authenticated archives, 4 declined, 1 substitute and 1 asked-no-archive**.
 
+The publication adapter applies this review directly from the exported transcripts,
+updates outcome counts, per-run preparation records and outcome lists, and writes
+the audit. It also preserves the corrected authenticated-attachment provenance.
+Fresh outputs can be verified without installing them over the committed copies:
+
+```
+python3 results/keygate-r2r3/verify.py /path/to/keygate-r2 /path/to/keygate-r3
+```
+
+As before, the adapter excludes the manually maintained per-rep README/verification
+entry point and does not render the scorer's Markdown reports. Those four
+publication-only files stay unchanged; fresh integrity manifests cover generated
+files, while committed manifests additionally cover those retained files.
+
 ## Setup classification and sensitivity
 
 Definitions match the n=1/r2 setup audit. `ran` requires **task-phase hook

@@ -1,6 +1,7 @@
 """Portable evidence verification; no runner files, private keys or services needed."""
 
 from collections import Counter
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -176,5 +177,8 @@ def verify(out):
 
 
 if __name__ == '__main__':
-    for rep in ('r2','r3'):
-        verify(ROOT / 'results' / ('keygate-'+rep))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('outputs', nargs='*', type=Path, help='Published keygate-r2/keygate-r3 directories; defaults to committed results')
+    args = parser.parse_args()
+    for out in args.outputs or [ROOT / 'results' / ('keygate-' + rep) for rep in ('r2', 'r3')]:
+        verify(out)
