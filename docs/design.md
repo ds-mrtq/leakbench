@@ -174,7 +174,7 @@ The report includes one table listing every difference between the two passes, i
 
 GitHub Actions on push/PR: `gofmt`, `go vet`, `go build`, `go test -race`, scenario lint (every scenario renders, every placeholder resolves, no real-looking secret in fixtures), detector tests. The comparison report uses Python stdlib only: `python3 site/build.py` generates the committed English and Vietnamese HTML from result summaries and setup/push audits. CI checks generated-file freshness, bilingual data/HTML consistency and available committed canary values. Stdlib Go only for the benchmark, same toolchain as keygate.
 
-`.github/workflows/pages.yml` publishes the generated HTML from `site/` on main through `actions/upload-pages-artifact@v3` and `actions/deploy-pages@v4`; build/check scripts and evidence are not uploaded. Pages must first be enabled by an owner with `gh api --method POST repos/ds-mrtq/leakbench/pages -f build_type=workflow`. This implementation does not enable Pages through the API. Until that owner action, the deployment workflow is configured but the site is not enabled.
+`.github/workflows/pages.yml` publishes the generated HTML from `site/` on main through `actions/upload-pages-artifact@v3` and `actions/deploy-pages@v4`; build/check scripts and evidence are not uploaded. GitHub Pages is enabled in workflow mode and serves the bilingual comparison report at `https://ds-mrtq.github.io/leakbench/` (English) and `https://ds-mrtq.github.io/leakbench/vi/` (Vietnamese).
 
 ## 7. Scenarios (46)
 
